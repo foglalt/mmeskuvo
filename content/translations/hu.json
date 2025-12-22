@@ -1,0 +1,27 @@
+{
+  "nav.home": "Kezdőlap",
+  "nav.info": "Információk",
+  "nav.rsvp": "Visszajelzés",
+  "nav.support": "Támogatás",
+  "nav.about": "Rólunk",
+  
+  "rsvp.title": "Visszajelzés",
+  "rsvp.name": "Név",
+  "rsvp.namePlaceholder": "Add meg a neved",
+  "rsvp.addGuest": "További vendég hozzáadása",
+  "rsvp.phone": "Telefonszám",
+  "rsvp.phonePlaceholder": "+36 XX XXX XXXX",
+  "rsvp.accommodation": "Szállásban segítségre van szükségem",
+  "rsvp.transport": "Szállításban segítségre van szükségem",
+  "rsvp.volunteerTitle": "Szeretnék segíteni",
+  "rsvp.comments": "Egyéb megjegyzés...",
+  "rsvp.submit": "Visszajelzés küldése",
+  "rsvp.success": "Köszönjük a visszajelzést!",
+  "rsvp.error": "Hiba történt, kérlek próbáld újra.",
+  
+  "support.title": "Szeretnélek támogatni",
+  "about.title": "Rólunk",
+  
+  "language.toggle": "Nyelv",
+  "scrollDown": "Görgess lejjebb"
+}

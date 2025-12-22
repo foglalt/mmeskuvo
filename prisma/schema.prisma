@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Main site content - single row storing all editable content
+model SiteContent {
+  id    String @id @default("main")
+  
+  // Theme settings (colors, fonts)
+  theme Json // { primary, secondary, accent, fontHeading, fontBody }
+  
+  // Section content
+  hero    Json // { invitationImage, showScrollHint }
+  info    Json // { mainText, subsections: [{ title, content }] }
+  support Json // { intro, options: [{ title, desc, link }], volunteerOptions: [] }
+  about   Json // { story, images: [{ src, caption }] }
+  
+  updatedAt DateTime @updatedAt
+}
+
+// Translations for multi-language support
+model Translation {
+  id        String   @id // "hu" or "en"
+  content   Json     // All UI strings as key-value pairs
+  updatedAt DateTime @updatedAt
+}
+
+// RSVP submissions from guests
+model RsvpSubmission {
+  id String @id @default(cuid())
+  
+  // Guest info
+  guestName        String
+  additionalGuests String[] // Array of additional guest names
+  phone            String?
+  
+  // Needs
+  needsAccommodation Boolean @default(false)
+  needsTransport     Boolean @default(false)
+  
+  // Support options
+  volunteerOptions String[] // Selected volunteer options
+  comments         String?  // Additional comments
+  
+  // Metadata
+  language  String   @default("hu") // Language used when submitting
+  createdAt DateTime @default(now())
+}

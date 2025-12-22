@@ -1,0 +1,27 @@
+{
+  "nav.home": "Home",
+  "nav.info": "Information",
+  "nav.rsvp": "RSVP",
+  "nav.support": "Support",
+  "nav.about": "About Us",
+  
+  "rsvp.title": "RSVP",
+  "rsvp.name": "Name",
+  "rsvp.namePlaceholder": "Enter your name",
+  "rsvp.addGuest": "Add another guest",
+  "rsvp.phone": "Phone number",
+  "rsvp.phonePlaceholder": "+36 XX XXX XXXX",
+  "rsvp.accommodation": "I need help with accommodation",
+  "rsvp.transport": "I need help with transportation",
+  "rsvp.volunteerTitle": "I would like to help",
+  "rsvp.comments": "Additional comments...",
+  "rsvp.submit": "Submit RSVP",
+  "rsvp.success": "Thank you for your response!",
+  "rsvp.error": "An error occurred, please try again.",
+  
+  "support.title": "I'd Like to Support You",
+  "about.title": "About Us",
+  
+  "language.toggle": "Language",
+  "scrollDown": "Scroll down"
+}
