@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { rsvpSubmissionSchema } from "@/lib/validations";
 import { verifyAuth } from "@/lib/auth";
 
 // POST - Public, submit new RSVP
 export async function POST(request: NextRequest) {
   try {
+    const prisma = getPrisma();
     const body = await request.json();
     const validated = rsvpSubmissionSchema.safeParse(body);
 
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
 // GET - Protected, fetch all RSVPs
 export async function GET(request: NextRequest) {
   try {
+    const prisma = getPrisma();
     const authResult = await verifyAuth(request);
     if (!authResult.success) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

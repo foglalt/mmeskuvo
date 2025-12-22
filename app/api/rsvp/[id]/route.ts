@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 
 export async function DELETE(
   request: NextRequest,
@@ -13,6 +13,7 @@ export async function DELETE(
   const { id } = await params;
 
   try {
+    const prisma = getPrisma();
     await prisma.rsvpSubmission.delete({
       where: { id },
     });

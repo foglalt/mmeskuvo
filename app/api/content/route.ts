@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { siteContentSchema } from "@/lib/validations";
 import { verifyAuth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 // GET - Public, fetch all site content
 export async function GET() {
   try {
+    const prisma = getPrisma();
     const content = await prisma.siteContent.findUnique({
       where: { id: "main" },
     });
@@ -55,6 +56,7 @@ export async function GET() {
 // PUT - Protected, update site content
 export async function PUT(request: NextRequest) {
   try {
+    const prisma = getPrisma();
     // Verify auth
     const authResult = await verifyAuth(request);
     if (!authResult.success) {
