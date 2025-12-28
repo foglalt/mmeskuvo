@@ -23,11 +23,11 @@ const defaultContent: Omit<SiteContent, "id" | "updatedAt"> = {
     fontBody: "Lora",
   },
   hero: {
-    invitationImage: "/images/invitation-placeholder.jpg",
+    invitationImage: "/images/invitation-placeholder.svg",
     showScrollHint: true,
   },
   info: {
-    mainText: "# Hamarosan\n\nAz esküvői információk hamarosan elérhetők lesznek.",
+    mainText: "# Hamarosan\n\nAz eskuvoi informaciok hamarosan elerhetok lesznek.",
     subsections: [],
   },
   support: {
@@ -129,3 +129,5 @@ export default function Home() {
     </Providers>
   );
 }
+
+

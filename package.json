@@ -8,7 +8,9 @@
     "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
-    "hooks:install": "git config core.hooksPath .githooks"
+    "hooks:install": "git config core.hooksPath .githooks",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@prisma/client": "^7.2.0",
@@ -24,13 +26,19 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.0.2",
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
+    "jsdom": "^26.1.0",
     "prisma": "^7.2.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

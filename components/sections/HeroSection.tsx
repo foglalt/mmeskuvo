@@ -9,11 +9,20 @@ interface HeroSectionProps {
   content: HeroContent;
 }
 
+const FALLBACK_INVITATION_IMAGE = "/images/invitation-placeholder.svg";
+const LEGACY_PLACEHOLDER_IMAGE = "/images/invitation-placeholder.jpg";
+
 export function HeroSection({ content }: HeroSectionProps) {
   const scrollToNext = () => {
     const infoSection = document.getElementById("info");
     infoSection?.scrollIntoView({ behavior: "smooth" });
   };
+
+  const invitationImage =
+    content.invitationImage &&
+    content.invitationImage !== LEGACY_PLACEHOLDER_IMAGE
+      ? content.invitationImage
+      : FALLBACK_INVITATION_IMAGE;
 
   return (
     <section
@@ -29,7 +38,7 @@ export function HeroSection({ content }: HeroSectionProps) {
           className="relative aspect-[3/4] w-full"
         >
           <Image
-            src={content.invitationImage}
+            src={invitationImage}
             alt="Wedding Invitation"
             fill
             className="object-contain"

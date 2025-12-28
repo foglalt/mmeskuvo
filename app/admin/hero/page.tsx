@@ -9,7 +9,7 @@ import type { HeroContent } from "@/types/content";
 
 export default function EditHeroPage() {
   const [content, setContent] = useState<HeroContent>({
-    invitationImage: "/images/invitation-placeholder.jpg",
+    invitationImage: "/images/invitation-placeholder.svg",
     showScrollHint: true,
   });
   const [availableImages, setAvailableImages] = useState<string[]>([]);

@@ -6,3 +6,6 @@ npm run lint
 
 echo "Running build..."
 npm run build
+
+echo "Running tests..."
+npm run test

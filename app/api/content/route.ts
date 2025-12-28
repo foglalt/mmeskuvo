@@ -4,6 +4,34 @@ import { siteContentSchema } from "@/lib/validations";
 import { verifyAuth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+const defaultContent = {
+  id: "main",
+  theme: {
+    primary: "#d4a574",
+    secondary: "#f5f0e8",
+    accent: "#8b7355",
+    fontHeading: "Playfair Display",
+    fontBody: "Lora",
+  },
+  hero: {
+    invitationImage: "/images/invitation-placeholder.svg",
+    showScrollHint: true,
+  },
+  info: {
+    mainText: "# Hamarosan\n\nAz eskuvoi informaciok hamarosan elerhetok lesznek.",
+    subsections: [],
+  },
+  support: {
+    intro: "",
+    options: [],
+    volunteerOptions: [],
+  },
+  about: {
+    story: "",
+    images: [],
+  },
+};
+
 // GET - Public, fetch all site content
 export async function GET() {
   try {
@@ -13,43 +41,13 @@ export async function GET() {
     });
 
     if (!content) {
-      // Return default content if none exists
-      return NextResponse.json({
-        id: "main",
-        theme: {
-          primary: "#d4a574",
-          secondary: "#f5f0e8",
-          accent: "#8b7355",
-          fontHeading: "Playfair Display",
-          fontBody: "Lora",
-        },
-        hero: {
-          invitationImage: "/images/invitation-placeholder.jpg",
-          showScrollHint: true,
-        },
-        info: {
-          mainText: "# Esküvői Információk\n\nHamarosan...",
-          subsections: [],
-        },
-        support: {
-          intro: "",
-          options: [],
-          volunteerOptions: [],
-        },
-        about: {
-          story: "",
-          images: [],
-        },
-      });
+      return NextResponse.json(defaultContent);
     }
 
     return NextResponse.json(content);
   } catch (error) {
     console.error("Failed to fetch content:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json(defaultContent);
   }
 }
 
@@ -94,11 +92,11 @@ export async function PUT(request: NextRequest) {
           fontBody: "Lora",
         },
         hero: validated.data.hero || {
-          invitationImage: "/images/invitation-placeholder.jpg",
+          invitationImage: "/images/invitation-placeholder.svg",
           showScrollHint: true,
         },
         info: validated.data.info || {
-          mainText: "",
+          mainText: "# Hamarosan\n\nAz eskuvoi informaciok hamarosan elerhetok lesznek.",
           subsections: [],
         },
         support: validated.data.support || {
@@ -125,3 +123,8 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+
+
+
+

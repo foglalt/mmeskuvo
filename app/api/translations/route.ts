@@ -50,10 +50,7 @@ export async function GET() {
     return NextResponse.json({ hu, en });
   } catch (error) {
     console.error("Failed to fetch translations:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json(defaultTranslations);
   }
 }
 

@@ -6,11 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/hooks/useLanguage";
 
 const PROMPT_SEEN_KEY = "wedding-language-prompt-seen";
-
-type PromptSnapshot = {
-  promptSeen: boolean;
-  deviceLanguage: string;
-};
+const SNAPSHOT_SEPARATOR = "::";
 
 const promptListeners = new Set<() => void>();
 
@@ -41,29 +37,34 @@ const subscribeToPrompt = (listener: () => void) => {
   };
 };
 
-const getPromptSnapshot = (): PromptSnapshot => {
+const getPromptSnapshot = (): string => {
   if (typeof window === "undefined") {
-    return { promptSeen: false, deviceLanguage: "hu" };
+    return `false${SNAPSHOT_SEPARATOR}hu`;
   }
 
+  const promptSeen = window.localStorage.getItem(PROMPT_SEEN_KEY) === "true";
+  const deviceLanguage = (navigator.language || "").toLowerCase();
+  return `${promptSeen}${SNAPSHOT_SEPARATOR}${deviceLanguage}`;
+};
+
+const getPromptServerSnapshot = (): string => `false${SNAPSHOT_SEPARATOR}hu`;
+
+const parsePromptSnapshot = (snapshot: string) => {
+  const [promptSeenRaw, deviceLanguage] = snapshot.split(SNAPSHOT_SEPARATOR);
   return {
-    promptSeen: window.localStorage.getItem(PROMPT_SEEN_KEY) === "true",
-    deviceLanguage: (navigator.language || "").toLowerCase(),
+    promptSeen: promptSeenRaw === "true",
+    deviceLanguage: deviceLanguage ?? "",
   };
 };
 
-const getPromptServerSnapshot = (): PromptSnapshot => ({
-  promptSeen: false,
-  deviceLanguage: "hu",
-});
-
 export function LanguagePrompt() {
   const { setLanguage, hasSavedLanguage } = useLanguage();
-  const { promptSeen, deviceLanguage } = useSyncExternalStore(
+  const snapshot = useSyncExternalStore(
     subscribeToPrompt,
     getPromptSnapshot,
     getPromptServerSnapshot
   );
+  const { promptSeen, deviceLanguage } = parsePromptSnapshot(snapshot);
 
   const shouldPrompt =
     !promptSeen &&
