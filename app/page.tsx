@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Providers } from "./providers";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { LanguagePrompt } from "@/components/layout/LanguagePrompt";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { InfoSection } from "@/components/sections/InfoSection";
 import { RsvpSection } from "@/components/sections/RsvpSection";
@@ -79,6 +80,7 @@ function HomePage() {
 
   return (
     <>
+      <LanguagePrompt />
       <Navbar
         items={navItems}
         language={language}

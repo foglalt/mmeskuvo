@@ -5,6 +5,15 @@
 
 ---
 
+## Project Notes (Updated)
+
+- Translations are stored in NeonDB (Translation table) and edited in `/admin/translations`.
+- JSON defaults in `content/translations` are used for seeding/fallback.
+- Language prompt is dismissable and shows only when device language is not Hungarian.
+- Images are pre-uploaded to `public/images` and selected via `/api/images`.
+
+---
+
 ## 1. File Creation Order
 
 Create files in this order to satisfy dependencies:

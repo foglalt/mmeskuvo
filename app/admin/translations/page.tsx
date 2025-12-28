@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { Save } from "lucide-react";
 
-type TranslationDict = Record<string, Record<string, string>>;
+type TranslationMap = Record<string, string>;
 
 export default function EditTranslationsPage() {
-  const [translations, setTranslations] = useState<{ hu: TranslationDict; en: TranslationDict }>({
+  const [translations, setTranslations] = useState<{ hu: TranslationMap; en: TranslationMap }>({
     hu: {},
     en: {},
   });
@@ -16,22 +16,28 @@ export default function EditTranslationsPage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    // Load translations from files
-    Promise.all([
-      fetch("/content/translations/hu.json").then((r) => r.json()),
-      fetch("/content/translations/en.json").then((r) => r.json()),
-    ]).then(([hu, en]) => {
-      setTranslations({ hu, en });
-    });
+    fetch("/api/translations")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.hu && data?.en) {
+          setTranslations({ hu: data.hu, en: data.en });
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const handleSave = async () => {
     setIsSaving(true);
     setSaved(false);
     try {
-      // Note: In production, you would create an API route to save translations
-      // For now, translations are static JSON files
-      console.log("Translations to save:", translations);
+      const res = await fetch("/api/translations", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(translations),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to save translations");
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
@@ -41,20 +47,25 @@ export default function EditTranslationsPage() {
     }
   };
 
-  const updateValue = (section: string, key: string, value: string) => {
-    setTranslations({
-      ...translations,
+  const updateValue = (key: string, value: string) => {
+    setTranslations((prev) => ({
+      ...prev,
       [activeTab]: {
-        ...translations[activeTab],
-        [section]: {
-          ...(translations[activeTab][section] || {}),
-          [key]: value,
-        },
+        ...prev[activeTab],
+        [key]: value,
       },
-    });
+    }));
   };
 
   const currentTranslations = translations[activeTab];
+  const groupedKeys = Object.keys(currentTranslations)
+    .sort()
+    .reduce<Record<string, string[]>>((acc, key) => {
+      const group = key.split(".")[0] || "general";
+      if (!acc[group]) acc[group] = [];
+      acc[group].push(key);
+      return acc;
+    }, {});
 
   return (
     <div className="max-w-4xl">
@@ -90,39 +101,41 @@ export default function EditTranslationsPage() {
         </div>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-        <p className="text-sm text-yellow-800">
-          <strong>Megjegyzés:</strong> A fordítások jelenleg statikus JSON fájlokban vannak tárolva.
-          A módosításokhoz manuálisan kell szerkeszteni a <code>/content/translations/</code> mappában lévő fájlokat.
-        </p>
-      </div>
-
       <div className="space-y-6">
-        {Object.entries(currentTranslations).map(([section, values]) => (
-          <Card key={section}>
-            <CardHeader>
-              <CardTitle className="capitalize">{section}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4">
-                {Object.entries(values as Record<string, string>).map(([key, value]) => (
-                  <div key={key} className="grid grid-cols-3 gap-4 items-start">
-                    <label className="text-sm font-medium text-gray-600 py-2">
-                      {key}
-                    </label>
-                    <div className="col-span-2">
-                      <Input
-                        value={value}
-                        onChange={(e) => updateValue(section, key, e.target.value)}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+        {Object.keys(groupedKeys).length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-sm text-gray-500">
+              No translations loaded yet.
             </CardContent>
           </Card>
-        ))}
+        ) : (
+          Object.entries(groupedKeys).map(([group, keys]) => (
+            <Card key={group}>
+              <CardHeader>
+                <CardTitle className="capitalize">{group}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4">
+                  {keys.map((key) => (
+                    <div key={key} className="grid grid-cols-3 gap-4 items-start">
+                      <label className="text-sm font-medium text-gray-600 py-2">
+                        {key}
+                      </label>
+                      <div className="col-span-2">
+                        <Input
+                          value={currentTranslations[key]}
+                          onChange={(e) => updateValue(key, e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );
 }
+

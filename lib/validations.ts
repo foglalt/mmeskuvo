@@ -74,6 +74,12 @@ export const rsvpSubmissionSchema = z.object({
   language: z.enum(["hu", "en"]).default("hu"),
 });
 
+// Translations
+export const translationsSchema = z.object({
+  hu: z.record(z.string()),
+  en: z.record(z.string()),
+});
+
 // Type exports
 export type ThemeConfig = z.infer<typeof themeSchema>;
 export type HeroContent = z.infer<typeof heroSchema>;
@@ -85,3 +91,4 @@ export type GalleryImage = z.infer<typeof galleryImageSchema>;
 export type AboutContent = z.infer<typeof aboutSchema>;
 export type SiteContentInput = z.infer<typeof siteContentSchema>;
 export type RsvpSubmissionInput = z.infer<typeof rsvpSubmissionSchema>;
+export type TranslationsInput = z.infer<typeof translationsSchema>;
