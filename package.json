@@ -7,7 +7,8 @@
     "build": "next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "hooks:install": "git config core.hooksPath .githooks"
   },
   "dependencies": {
     "@prisma/client": "^7.2.0",

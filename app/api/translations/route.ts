@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
 import { translationsSchema } from "@/lib/validations";
@@ -6,6 +7,7 @@ import huFallback from "@/content/translations/hu.json";
 import enFallback from "@/content/translations/en.json";
 
 type TranslationMap = Record<string, string>;
+const toJson = (value: TranslationMap): Prisma.InputJsonValue => value;
 
 const defaultTranslations: { hu: TranslationMap; en: TranslationMap } = {
   hu: huFallback as TranslationMap,
@@ -25,14 +27,14 @@ async function getOrCreateTranslation(
 
   if (!existing) {
     const created = await prisma.translation.create({
-      data: { id, content: fallback },
+      data: { id, content: toJson(fallback) },
     });
     return created.content as TranslationMap;
   }
 
   const updated = await prisma.translation.update({
     where: { id },
-    data: { content: fallback },
+    data: { content: toJson(fallback) },
   });
   return updated.content as TranslationMap;
 }
@@ -73,17 +75,22 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    const translations = parsed.data as {
+      hu: TranslationMap;
+      en: TranslationMap;
+    };
+
     const prisma = getPrisma();
     const [hu, en] = await Promise.all([
       prisma.translation.upsert({
         where: { id: "hu" },
-        update: { content: parsed.data.hu },
-        create: { id: "hu", content: parsed.data.hu },
+        update: { content: toJson(translations.hu) },
+        create: { id: "hu", content: toJson(translations.hu) },
       }),
       prisma.translation.upsert({
         where: { id: "en" },
-        update: { content: parsed.data.en },
-        create: { id: "en", content: parsed.data.en },
+        update: { content: toJson(translations.en) },
+        create: { id: "en", content: toJson(translations.en) },
       }),
     ]);
 

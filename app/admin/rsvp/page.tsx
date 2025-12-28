@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button } from "@/components/ui";
+import { Card, CardContent, Button } from "@/components/ui";
 import { Download, Trash2, Users, Car, Home } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import type { RsvpSubmission } from "@/types/content";

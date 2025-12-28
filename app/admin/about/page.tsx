@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button, Textarea, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { AboutSection } from "@/components/sections/AboutSection";
-import { Save, Plus, Trash2 } from "lucide-react";
-import type { AboutContent, GalleryImage } from "@/types/content";
+import { Save, Trash2 } from "lucide-react";
+import type { AboutContent } from "@/types/content";
 
 export default function EditAboutPage() {
   const [content, setContent] = useState<AboutContent>({

@@ -76,8 +76,8 @@ export const rsvpSubmissionSchema = z.object({
 
 // Translations
 export const translationsSchema = z.object({
-  hu: z.record(z.string()),
-  en: z.record(z.string()),
+  hu: z.record(z.string(), z.string()),
+  en: z.record(z.string(), z.string()),
 });
 
 // Type exports

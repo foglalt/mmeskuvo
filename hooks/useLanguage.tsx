@@ -3,10 +3,9 @@
 import {
   createContext,
   useContext,
-  useState,
   useCallback,
-  useEffect,
   ReactNode,
+  useSyncExternalStore,
 } from "react";
 
 type Language = "hu" | "en";
@@ -17,6 +16,7 @@ interface Translations {
 
 interface LanguageContextType {
   language: Language;
+  hasSavedLanguage: boolean;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
 }
@@ -32,24 +32,65 @@ interface LanguageProviderProps {
   };
 }
 
+const LANGUAGE_STORAGE_KEY = "wedding-language";
+const languageListeners = new Set<() => void>();
+
+const emitLanguageChange = () => {
+  languageListeners.forEach((listener) => listener());
+};
+
+const subscribeToLanguage = (listener: () => void) => {
+  languageListeners.add(listener);
+
+  if (typeof window === "undefined") {
+    return () => {
+      languageListeners.delete(listener);
+    };
+  }
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === LANGUAGE_STORAGE_KEY) {
+      listener();
+    }
+  };
+
+  window.addEventListener("storage", handleStorage);
+
+  return () => {
+    languageListeners.delete(listener);
+    window.removeEventListener("storage", handleStorage);
+  };
+};
+
+const getLanguageSnapshot = () => {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+};
+
+const getLanguageServerSnapshot = () => null;
+
+const isLanguage = (value: string | null): value is Language =>
+  value === "hu" || value === "en";
+
 export function LanguageProvider({
   children,
   defaultLanguage = "hu",
   translations,
 }: LanguageProviderProps) {
-  const [language, setLanguageState] = useState<Language>(defaultLanguage);
+  const storedLanguage = useSyncExternalStore(
+    subscribeToLanguage,
+    getLanguageSnapshot,
+    getLanguageServerSnapshot
+  );
 
-  // Load saved language preference
-  useEffect(() => {
-    const saved = localStorage.getItem("wedding-language") as Language | null;
-    if (saved && (saved === "hu" || saved === "en")) {
-      setLanguageState(saved);
-    }
-  }, []);
+  const hasSavedLanguage = isLanguage(storedLanguage);
+  const language = hasSavedLanguage ? storedLanguage : defaultLanguage;
 
   const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
-    localStorage.setItem("wedding-language", lang);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+    }
+    emitLanguageChange();
   }, []);
 
   const t = useCallback(
@@ -60,7 +101,9 @@ export function LanguageProvider({
   );
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider
+      value={{ language, hasSavedLanguage, setLanguage, t }}
+    >
       {children}
     </LanguageContext.Provider>
   );

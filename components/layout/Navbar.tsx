@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { LanguageToggle } from "./LanguageToggle";
-import { cn } from "@/lib/utils";
 
 interface NavbarProps {
   items: Array<{ href: string; label: string }>;

@@ -1,40 +1,94 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { useLanguage } from "@/hooks/useLanguage";
 
 const PROMPT_SEEN_KEY = "wedding-language-prompt-seen";
 
-export function LanguagePrompt() {
-  const { setLanguage } = useLanguage();
-  const [isOpen, setIsOpen] = useState(false);
+type PromptSnapshot = {
+  promptSeen: boolean;
+  deviceLanguage: string;
+};
 
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem("wedding-language");
-    const promptSeen = localStorage.getItem(PROMPT_SEEN_KEY);
-    if (savedLanguage || promptSeen) return;
+const promptListeners = new Set<() => void>();
 
-    const deviceLanguage = (navigator.language || "").toLowerCase();
-    if (deviceLanguage && !deviceLanguage.startsWith("hu")) {
-      setIsOpen(true);
+const emitPromptChange = () => {
+  promptListeners.forEach((listener) => listener());
+};
+
+const subscribeToPrompt = (listener: () => void) => {
+  promptListeners.add(listener);
+
+  if (typeof window === "undefined") {
+    return () => {
+      promptListeners.delete(listener);
+    };
+  }
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === PROMPT_SEEN_KEY) {
+      listener();
     }
-  }, []);
+  };
+
+  window.addEventListener("storage", handleStorage);
+
+  return () => {
+    promptListeners.delete(listener);
+    window.removeEventListener("storage", handleStorage);
+  };
+};
+
+const getPromptSnapshot = (): PromptSnapshot => {
+  if (typeof window === "undefined") {
+    return { promptSeen: false, deviceLanguage: "hu" };
+  }
+
+  return {
+    promptSeen: window.localStorage.getItem(PROMPT_SEEN_KEY) === "true",
+    deviceLanguage: (navigator.language || "").toLowerCase(),
+  };
+};
+
+const getPromptServerSnapshot = (): PromptSnapshot => ({
+  promptSeen: false,
+  deviceLanguage: "hu",
+});
+
+export function LanguagePrompt() {
+  const { setLanguage, hasSavedLanguage } = useLanguage();
+  const { promptSeen, deviceLanguage } = useSyncExternalStore(
+    subscribeToPrompt,
+    getPromptSnapshot,
+    getPromptServerSnapshot
+  );
+
+  const shouldPrompt =
+    !promptSeen &&
+    !hasSavedLanguage &&
+    deviceLanguage !== "" &&
+    !deviceLanguage.startsWith("hu");
+
+  const markPromptSeen = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(PROMPT_SEEN_KEY, "true");
+    }
+    emitPromptChange();
+  };
 
   const handleSelect = (lang: "hu" | "en") => {
     setLanguage(lang);
-    localStorage.setItem(PROMPT_SEEN_KEY, "true");
-    setIsOpen(false);
+    markPromptSeen();
   };
 
   const handleDismiss = () => {
-    localStorage.setItem(PROMPT_SEEN_KEY, "true");
-    setIsOpen(false);
+    markPromptSeen();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleDismiss} title="Choose language">
+    <Modal isOpen={shouldPrompt} onClose={handleDismiss} title="Choose language">
       <p className="text-sm text-gray-600">
         We noticed your device language is not Hungarian. Choose your preferred
         language below.

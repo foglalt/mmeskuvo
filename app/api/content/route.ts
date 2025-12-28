@@ -74,11 +74,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Get existing content
-    const existing = await prisma.siteContent.findUnique({
-      where: { id: "main" },
-    });
-
     // Merge with existing or create new
     const updated = await prisma.siteContent.upsert({
       where: { id: "main" },
