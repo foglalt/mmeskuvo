@@ -30,7 +30,7 @@ export default function RsvpListPage() {
 
   const deleteSubmission = async (id: string) => {
     if (!confirm("Biztosan törölni szeretnéd?")) return;
-    
+
     try {
       await fetch(`/api/rsvp/${id}`, { method: "DELETE" });
       setSubmissions(submissions.filter((s) => s.id !== id));
@@ -38,6 +38,8 @@ export default function RsvpListPage() {
       console.error("Failed to delete:", error);
     }
   };
+
+  const escapeCsvValue = (value: string) => `"${value.replace(/\"/g, "\"\"")}"`;
 
   const exportToCSV = () => {
     const headers = [
@@ -50,7 +52,7 @@ export default function RsvpListPage() {
       "Megjegyzés",
       "Dátum",
     ];
-    
+
     const rows = submissions.map((s) => [
       s.guestName,
       s.additionalGuests.join("; "),
@@ -62,16 +64,18 @@ export default function RsvpListPage() {
       formatDateTime(s.createdAt),
     ]);
 
-    const csv = [headers, ...rows].map((row) => row.join(",")).join("\n");
+    const csv = [headers, ...rows]
+      .map((row) => row.map((value) => escapeCsvValue(value)).join(","))
+      .join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `rsvp-${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `rsvp-${new Date().toISOString().split("T")[0]}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(url);
   };
 
-  // Calculate stats
   const totalGuests = submissions.reduce(
     (acc, s) => acc + 1 + s.additionalGuests.length,
     0
@@ -93,7 +97,6 @@ export default function RsvpListPage() {
         </Button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
@@ -133,7 +136,6 @@ export default function RsvpListPage() {
         </Card>
       </div>
 
-      {/* Table */}
       {submissions.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center text-gray-500">
@@ -172,8 +174,8 @@ export default function RsvpListPage() {
                   <td className="px-4 py-3">
                     {submission.additionalGuests.length > 0 ? (
                       <ul className="text-sm">
-                        {submission.additionalGuests.map((g, i) => (
-                          <li key={i}>{g}</li>
+                        {submission.additionalGuests.map((guest, index) => (
+                          <li key={index}>{guest}</li>
                         ))}
                       </ul>
                     ) : (

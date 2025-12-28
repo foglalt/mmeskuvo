@@ -53,13 +53,17 @@ function HomePage() {
 
   const rsvpTranslations = {
     title: t("rsvp.title"),
+    nameLabel: t("rsvp.name"),
     namePlaceholder: t("rsvp.namePlaceholder"),
     addGuest: t("rsvp.addGuest"),
+    phoneLabel: t("rsvp.phone"),
     phonePlaceholder: t("rsvp.phonePlaceholder"),
     accommodation: t("rsvp.accommodation"),
     transport: t("rsvp.transport"),
     volunteerTitle: t("rsvp.volunteerTitle"),
-    comments: t("rsvp.comments"),
+    commentsLabel: t("rsvp.commentsLabel"),
+    commentsPlaceholder: t("rsvp.comments"),
+    supportLink: t("rsvp.supportLink"),
     submit: t("rsvp.submit"),
     success: t("rsvp.success"),
     error: t("rsvp.error"),
@@ -92,11 +96,13 @@ function HomePage() {
         <InfoSection content={content.info} />
         <RsvpSection
           volunteerOptions={content.support.volunteerOptions}
+          language={language}
           translations={rsvpTranslations}
         />
         <SupportSection
           content={content.support}
           title={t("support.title")}
+          moreInfoLabel={t("support.moreInfo")}
         />
         <AboutSection
           content={content.about}

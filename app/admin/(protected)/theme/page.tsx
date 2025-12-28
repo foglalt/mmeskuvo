@@ -4,16 +4,7 @@ import { useState, useEffect } from "react";
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { Save } from "lucide-react";
 import type { ThemeConfig } from "@/types/content";
-
-const fontOptions = [
-  "Playfair Display",
-  "Cormorant Garamond",
-  "Great Vibes",
-  "Lora",
-  "Merriweather",
-  "Crimson Text",
-  "Libre Baskerville",
-];
+import { FONT_OPTIONS } from "@/lib/fonts";
 
 export default function EditThemePage() {
   const [theme, setTheme] = useState<ThemeConfig>({
@@ -33,7 +24,8 @@ export default function EditThemePage() {
         if (data?.theme) {
           setTheme(data.theme);
         }
-      });
+      })
+      .catch(console.error);
   }, []);
 
   const handleSave = async () => {
@@ -144,7 +136,7 @@ export default function EditThemePage() {
               onChange={(e) => setTheme({ ...theme, fontHeading: e.target.value })}
               className="w-full rounded-md border border-gray-300 px-3 py-2"
             >
-              {fontOptions.map((font) => (
+              {FONT_OPTIONS.map((font) => (
                 <option key={font} value={font}>
                   {font}
                 </option>
@@ -161,7 +153,7 @@ export default function EditThemePage() {
               onChange={(e) => setTheme({ ...theme, fontBody: e.target.value })}
               className="w-full rounded-md border border-gray-300 px-3 py-2"
             >
-              {fontOptions.map((font) => (
+              {FONT_OPTIONS.map((font) => (
                 <option key={font} value={font}>
                   {font}
                 </option>

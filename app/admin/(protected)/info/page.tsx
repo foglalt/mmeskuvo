@@ -21,7 +21,8 @@ export default function EditInfoPage() {
         if (data?.info) {
           setContent(data.info);
         }
-      });
+      })
+      .catch(console.error);
   }, []);
 
   const handleSave = async () => {
@@ -64,7 +65,6 @@ export default function EditInfoPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Editor */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-serif text-gray-900">Információk</h1>
@@ -74,7 +74,6 @@ export default function EditInfoPage() {
           </Button>
         </div>
 
-        {/* Main text */}
         <Card>
           <CardHeader>
             <CardTitle>Fő tartalom</CardTitle>
@@ -85,12 +84,11 @@ export default function EditInfoPage() {
               value={content.mainText}
               onChange={(e) => setContent({ ...content, mainText: e.target.value })}
               rows={10}
-              placeholder="# Cím&#10;&#10;Szöveg **félkövéren** vagy *dőlten*..."
+              placeholder="# Cím\n\nSzöveg **félkövérrel** vagy *dőlten*..."
             />
           </CardContent>
         </Card>
 
-        {/* Subsections */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-medium text-gray-700">Alszakaszok</h2>
@@ -131,11 +129,12 @@ export default function EditInfoPage() {
         </div>
 
         <p className="text-sm text-gray-500">
-          💡 Tipp: Használj Markdown formázást: <code># Cím</code>, <code>**félkövér**</code>, <code>*dőlt*</code>, <code>[link](url)</code>
+          Tipp: Használj Markdown formázást: <code># Cím</code>,{" "}
+          <code>**félkövér**</code>, <code>*dőlt*</code>,{" "}
+          <code>[link](url)</code>
         </p>
       </div>
 
-      {/* Preview */}
       <div className="lg:sticky lg:top-8 lg:self-start">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Előnézet</h2>
         <div className="border rounded-lg overflow-hidden bg-secondary/30 max-h-[80vh] overflow-auto">

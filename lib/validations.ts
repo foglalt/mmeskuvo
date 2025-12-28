@@ -92,3 +92,4 @@ export type AboutContent = z.infer<typeof aboutSchema>;
 export type SiteContentInput = z.infer<typeof siteContentSchema>;
 export type RsvpSubmissionInput = z.infer<typeof rsvpSubmissionSchema>;
 export type TranslationsInput = z.infer<typeof translationsSchema>;
+

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button, Textarea, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { AboutSection } from "@/components/sections/AboutSection";
-import { Save, Trash2 } from "lucide-react";
+import { Save, Trash2, ArrowUp, ArrowDown, Check } from "lucide-react";
 import type { AboutContent } from "@/types/content";
 
 export default function EditAboutPage() {
@@ -20,14 +20,16 @@ export default function EditAboutPage() {
     Promise.all([
       fetch("/api/content").then((res) => res.json()),
       fetch("/api/images").then((res) => res.json()),
-    ]).then(([contentData, imagesData]) => {
-      if (contentData?.about) {
-        setContent(contentData.about);
-      }
-      if (imagesData?.images) {
-        setAvailableImages(imagesData.images);
-      }
-    });
+    ])
+      .then(([contentData, imagesData]) => {
+        if (contentData?.about) {
+          setContent(contentData.about);
+        }
+        if (imagesData?.images) {
+          setAvailableImages(imagesData.images);
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const handleSave = async () => {
@@ -73,7 +75,7 @@ export default function EditAboutPage() {
   const moveImage = (index: number, direction: "up" | "down") => {
     const newIndex = direction === "up" ? index - 1 : index + 1;
     if (newIndex < 0 || newIndex >= content.images.length) return;
-    
+
     const updated = [...content.images];
     [updated[index], updated[newIndex]] = [updated[newIndex], updated[index]];
     setContent({ ...content, images: updated });
@@ -81,7 +83,6 @@ export default function EditAboutPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Editor */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-serif text-gray-900">Rólunk</h1>
@@ -91,7 +92,6 @@ export default function EditAboutPage() {
           </Button>
         </div>
 
-        {/* Story */}
         <Card>
           <CardHeader>
             <CardTitle>Történetünk</CardTitle>
@@ -106,7 +106,6 @@ export default function EditAboutPage() {
           </CardContent>
         </Card>
 
-        {/* Selected images */}
         <Card>
           <CardHeader>
             <CardTitle>Kiválasztott képek</CardTitle>
@@ -142,7 +141,7 @@ export default function EditAboutPage() {
                           onClick={() => moveImage(index, "up")}
                           disabled={index === 0}
                         >
-                          ↑
+                          <ArrowUp className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -150,7 +149,7 @@ export default function EditAboutPage() {
                           onClick={() => moveImage(index, "down")}
                           disabled={index === content.images.length - 1}
                         >
-                          ↓
+                          <ArrowDown className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -169,7 +168,6 @@ export default function EditAboutPage() {
           </CardContent>
         </Card>
 
-        {/* Available images */}
         <Card>
           <CardHeader>
             <CardTitle>Elérhető képek</CardTitle>
@@ -177,7 +175,8 @@ export default function EditAboutPage() {
           <CardContent>
             {availableImages.length === 0 ? (
               <p className="text-gray-500 text-sm">
-                Nincs elérhető kép. Helyezz képeket a <code>/public/images/</code> mappába.
+                Nincs elérhető kép. Helyezz képeket a{" "}
+                <code>/public/images/</code> mappába.
               </p>
             ) : (
               <div className="grid grid-cols-4 gap-2">
@@ -202,8 +201,8 @@ export default function EditAboutPage() {
                         sizes="80px"
                       />
                       {isSelected && (
-                        <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-                          ✓
+                        <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
+                          <Check className="h-5 w-5 text-primary" />
                         </div>
                       )}
                     </button>
@@ -215,7 +214,6 @@ export default function EditAboutPage() {
         </Card>
       </div>
 
-      {/* Preview */}
       <div className="lg:sticky lg:top-8 lg:self-start">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Előnézet</h2>
         <div className="border rounded-lg overflow-hidden bg-white max-h-[80vh] overflow-auto">

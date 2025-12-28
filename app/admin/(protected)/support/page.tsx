@@ -23,7 +23,8 @@ export default function EditSupportPage() {
         if (data?.support) {
           setContent(data.support);
         }
-      });
+      })
+      .catch(console.error);
   }, []);
 
   const handleSave = async () => {
@@ -83,7 +84,6 @@ export default function EditSupportPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Editor */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-serif text-gray-900">Támogatás</h1>
@@ -93,7 +93,6 @@ export default function EditSupportPage() {
           </Button>
         </div>
 
-        {/* Intro */}
         <Card>
           <CardHeader>
             <CardTitle>Bevezető szöveg</CardTitle>
@@ -108,10 +107,11 @@ export default function EditSupportPage() {
           </CardContent>
         </Card>
 
-        {/* Support options */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-700">Támogatási lehetőségek</h2>
+            <h2 className="text-lg font-medium text-gray-700">
+              Támogatási lehetőségek
+            </h2>
             <Button variant="outline" size="sm" onClick={addOption}>
               <Plus className="h-4 w-4 mr-2" />
               Új opció
@@ -153,7 +153,6 @@ export default function EditSupportPage() {
           ))}
         </div>
 
-        {/* Volunteer options */}
         <Card>
           <CardHeader>
             <CardTitle>Segítség opciók (checkboxok az RSVP-ben)</CardTitle>
@@ -163,14 +162,19 @@ export default function EditSupportPage() {
               <Input
                 value={newVolunteer}
                 onChange={(e) => setNewVolunteer(e.target.value)}
-                placeholder="Pl: Ételkészítés, Dekoráció..."
-                onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addVolunteerOption())}
+                placeholder="Pl: ételkészítés, dekoráció..."
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addVolunteerOption();
+                  }
+                }}
               />
               <Button variant="outline" onClick={addVolunteerOption}>
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-            
+
             <div className="flex flex-wrap gap-2">
               {content.volunteerOptions.map((opt, index) => (
                 <span
@@ -191,11 +195,14 @@ export default function EditSupportPage() {
         </Card>
       </div>
 
-      {/* Preview */}
       <div className="lg:sticky lg:top-8 lg:self-start">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Előnézet</h2>
         <div className="border rounded-lg overflow-hidden bg-secondary/20 max-h-[80vh] overflow-auto">
-          <SupportSection content={content} title="Szeretnélek támogatni" />
+          <SupportSection
+            content={content}
+            title="Szeretnélek támogatni"
+            moreInfoLabel="További információ"
+          />
         </div>
       </div>
     </div>

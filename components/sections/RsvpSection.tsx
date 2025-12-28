@@ -6,22 +6,31 @@ import type { SupportContent } from "@/types/content";
 
 interface RsvpSectionProps {
   volunteerOptions: SupportContent["volunteerOptions"];
+  language: "hu" | "en";
   translations: {
     title: string;
+    nameLabel: string;
     namePlaceholder: string;
     addGuest: string;
+    phoneLabel: string;
     phonePlaceholder: string;
     accommodation: string;
     transport: string;
     volunteerTitle: string;
-    comments: string;
+    commentsLabel: string;
+    commentsPlaceholder: string;
+    supportLink: string;
     submit: string;
     success: string;
     error: string;
   };
 }
 
-export function RsvpSection({ volunteerOptions, translations }: RsvpSectionProps) {
+export function RsvpSection({
+  volunteerOptions,
+  language,
+  translations,
+}: RsvpSectionProps) {
   return (
     <SectionWrapper id="rsvp" className="bg-white">
       <div className="text-center mb-8">
@@ -33,6 +42,7 @@ export function RsvpSection({ volunteerOptions, translations }: RsvpSectionProps
       <div className="max-w-xl mx-auto">
         <RsvpForm
           volunteerOptions={volunteerOptions}
+          language={language}
           translations={translations}
         />
       </div>

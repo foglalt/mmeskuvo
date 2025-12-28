@@ -11,9 +11,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/rsvp", {
-      headers: { Authorization: `Bearer ${document.cookie.split("=")[1]}` },
-    })
+    fetch("/api/rsvp")
       .then((res) => res.json())
       .then((data: RsvpSubmission[]) => {
         if (Array.isArray(data)) {
@@ -54,10 +52,9 @@ export default function AdminDashboard() {
   return (
     <div>
       <h1 className="text-3xl font-serif text-gray-900 mb-8">
-        Üdvözöljük az Admin felületen
+        Üdvözlünk az admin felületen
       </h1>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card>
           <CardContent className="flex items-center gap-4 py-4">
@@ -74,7 +71,6 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Quick Links */}
       <h2 className="text-xl font-semibold text-gray-900 mb-4">
         Gyors műveletek
       </h2>

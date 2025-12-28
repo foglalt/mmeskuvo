@@ -7,25 +7,29 @@ import { Button, Input, Textarea, Checkbox } from "@/components/ui";
 
 interface RsvpFormProps {
   volunteerOptions: string[];
+  language: "hu" | "en";
   translations: {
+    nameLabel: string;
     namePlaceholder: string;
     addGuest: string;
+    phoneLabel: string;
     phonePlaceholder: string;
     accommodation: string;
     transport: string;
     volunteerTitle: string;
-    comments: string;
+    commentsLabel: string;
+    commentsPlaceholder: string;
+    supportLink: string;
     submit: string;
     success: string;
     error: string;
   };
 }
 
-export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
+export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-  
-  // Form state
+
   const [guestName, setGuestName] = useState("");
   const [additionalGuests, setAdditionalGuests] = useState<string[]>([]);
   const [phone, setPhone] = useState("");
@@ -61,19 +65,40 @@ export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
+    const trimmedName = guestName.trim();
+    const trimmedPhone = phone.trim();
+    const trimmedComments = comments.trim();
+
+    const payload: {
+      guestName: string;
+      additionalGuests: string[];
+      needsAccommodation: boolean;
+      needsTransport: boolean;
+      volunteerOptions: string[];
+      language: "hu" | "en";
+      phone?: string;
+      comments?: string;
+    } = {
+      guestName: trimmedName,
+      additionalGuests: additionalGuests.filter((g) => g.trim() !== ""),
+      needsAccommodation,
+      needsTransport,
+      volunteerOptions: selectedVolunteer,
+      language,
+    };
+
+    if (trimmedPhone) {
+      payload.phone = trimmedPhone;
+    }
+    if (trimmedComments) {
+      payload.comments = trimmedComments;
+    }
+
     try {
       const response = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          guestName,
-          additionalGuests: additionalGuests.filter((g) => g.trim() !== ""),
-          phone: phone || undefined,
-          needsAccommodation,
-          needsTransport,
-          volunteerOptions: selectedVolunteer,
-          comments: comments || undefined,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -81,7 +106,6 @@ export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
       }
 
       setSubmitStatus("success");
-      // Reset form
       setGuestName("");
       setAdditionalGuests([]);
       setPhone("");
@@ -98,16 +122,14 @@ export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Guest name */}
       <Input
-        label="Név / Name"
+        label={translations.nameLabel}
         placeholder={translations.namePlaceholder}
         value={guestName}
         onChange={(e) => setGuestName(e.target.value)}
         required
       />
 
-      {/* Additional guests */}
       <div className="space-y-3">
         <AnimatePresence>
           {additionalGuests.map((guest, index) => (
@@ -135,7 +157,7 @@ export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
             </motion.div>
           ))}
         </AnimatePresence>
-        
+
         <Button
           type="button"
           variant="outline"
@@ -148,16 +170,14 @@ export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
         </Button>
       </div>
 
-      {/* Phone */}
       <Input
-        label="Telefonszám / Phone (opcionális)"
+        label={translations.phoneLabel}
         type="tel"
         placeholder={translations.phonePlaceholder}
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
       />
 
-      {/* Needs */}
       <div className="space-y-3">
         <Checkbox
           label={translations.accommodation}
@@ -171,7 +191,6 @@ export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
         />
       </div>
 
-      {/* Volunteer options */}
       {volunteerOptions.length > 0 && (
         <div className="space-y-3">
           <label className="block text-sm font-medium text-gray-700">
@@ -190,16 +209,20 @@ export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
         </div>
       )}
 
-      {/* Comments */}
+      <div className="text-sm text-gray-500">
+        <a href="#support" className="text-accent hover:underline">
+          {translations.supportLink}
+        </a>
+      </div>
+
       <Textarea
-        label="Megjegyzés / Comments"
-        placeholder={translations.comments}
+        label={translations.commentsLabel}
+        placeholder={translations.commentsPlaceholder}
         value={comments}
         onChange={(e) => setComments(e.target.value)}
         rows={4}
       />
 
-      {/* Submit button */}
       <Button
         type="submit"
         size="lg"
@@ -210,7 +233,6 @@ export function RsvpForm({ volunteerOptions, translations }: RsvpFormProps) {
         {translations.submit}
       </Button>
 
-      {/* Status messages */}
       <AnimatePresence>
         {submitStatus === "success" && (
           <motion.div

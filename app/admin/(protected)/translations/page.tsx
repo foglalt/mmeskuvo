@@ -105,7 +105,7 @@ export default function EditTranslationsPage() {
         {Object.keys(groupedKeys).length === 0 ? (
           <Card>
             <CardContent className="py-8 text-sm text-gray-500">
-              No translations loaded yet.
+              Még nincs betöltött fordítás.
             </CardContent>
           </Card>
         ) : (
@@ -138,4 +138,3 @@ export default function EditTranslationsPage() {
     </div>
   );
 }
-

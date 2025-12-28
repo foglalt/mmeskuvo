@@ -16,19 +16,20 @@ export default function EditHeroPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Fetch current content and available images
   useEffect(() => {
     Promise.all([
       fetch("/api/content").then((res) => res.json()),
       fetch("/api/images").then((res) => res.json()),
-    ]).then(([contentData, imagesData]) => {
-      if (contentData?.hero) {
-        setContent(contentData.hero);
-      }
-      if (imagesData?.images) {
-        setAvailableImages(imagesData.images);
-      }
-    });
+    ])
+      .then(([contentData, imagesData]) => {
+        if (contentData?.hero) {
+          setContent(contentData.hero);
+        }
+        if (imagesData?.images) {
+          setAvailableImages(imagesData.images);
+        }
+      })
+      .catch(console.error);
   }, []);
 
   const handleSave = async () => {
@@ -51,7 +52,6 @@ export default function EditHeroPage() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Editor */}
       <div>
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-serif text-gray-900">Meghívó / Hero</h1>
@@ -66,7 +66,6 @@ export default function EditHeroPage() {
             <CardTitle>Meghívó kép</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Image URL input */}
             <Input
               label="Kép elérési útja"
               value={content.invitationImage}
@@ -76,7 +75,6 @@ export default function EditHeroPage() {
               placeholder="/images/invitation.jpg"
             />
 
-            {/* Available images */}
             {availableImages.length > 0 && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -108,7 +106,6 @@ export default function EditHeroPage() {
               </div>
             )}
 
-            {/* Options */}
             <Checkbox
               label="Görgetés jelzés mutatása"
               checked={content.showScrollHint}
@@ -120,12 +117,11 @@ export default function EditHeroPage() {
         </Card>
 
         <p className="mt-4 text-sm text-gray-500">
-          💡 Tipp: A meghívó képet a <code>/public/images/</code> mappába kell
+          Tipp: A meghívó képet a <code>/public/images/</code> mappába kell
           elhelyezni, majd itt kiválasztani.
         </p>
       </div>
 
-      {/* Preview */}
       <div className="lg:sticky lg:top-8">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Előnézet</h2>
         <div className="border rounded-lg overflow-hidden bg-white max-h-[80vh] overflow-auto">

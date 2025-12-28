@@ -6,9 +6,14 @@ import type { SupportContent } from "@/types/content";
 interface SupportSectionProps {
   content: SupportContent;
   title: string;
+  moreInfoLabel?: string;
 }
 
-export function SupportSection({ content, title }: SupportSectionProps) {
+export function SupportSection({
+  content,
+  title,
+  moreInfoLabel = "More info",
+}: SupportSectionProps) {
   return (
     <SectionWrapper id="support" className="bg-secondary/20">
       <div className="text-center mb-8">
@@ -17,14 +22,12 @@ export function SupportSection({ content, title }: SupportSectionProps) {
         </h2>
       </div>
 
-      {/* Intro text */}
       {content.intro && (
         <div className="mb-8">
           <MarkdownRenderer content={content.intro} />
         </div>
       )}
 
-      {/* Support options */}
       {content.options?.length > 0 && (
         <div className="grid gap-6 md:grid-cols-2">
           {content.options.map((option, index) => (
@@ -41,7 +44,7 @@ export function SupportSection({ content, title }: SupportSectionProps) {
                     rel="noopener noreferrer"
                     className="mt-4 inline-block text-accent hover:underline"
                   >
-                    További információ →
+                    {moreInfoLabel}
                   </a>
                 )}
               </CardContent>

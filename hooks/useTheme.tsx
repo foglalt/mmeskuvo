@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, ReactNode } from "react";
 import type { ThemeConfig } from "@/types/content";
+import { FONT_VARIABLES } from "@/lib/fonts";
 
 interface ThemeContextType {
   theme: ThemeConfig;
@@ -18,11 +19,13 @@ export function ThemeProvider({ children, theme }: ThemeProviderProps) {
   // Apply theme to CSS variables
   useEffect(() => {
     const root = document.documentElement;
+    const headingFont = FONT_VARIABLES[theme.fontHeading] ?? theme.fontHeading;
+    const bodyFont = FONT_VARIABLES[theme.fontBody] ?? theme.fontBody;
     root.style.setProperty("--color-primary", theme.primary);
     root.style.setProperty("--color-secondary", theme.secondary);
     root.style.setProperty("--color-accent", theme.accent);
-    root.style.setProperty("--font-heading", theme.fontHeading);
-    root.style.setProperty("--font-body", theme.fontBody);
+    root.style.setProperty("--font-heading", headingFont);
+    root.style.setProperty("--font-body", bodyFont);
   }, [theme]);
 
   return (

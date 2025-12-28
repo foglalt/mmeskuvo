@@ -7,7 +7,7 @@ export default function AdminLoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center font-serif text-2xl">
-            Admin Belépés
+            Admin belépés
           </CardTitle>
         </CardHeader>
         <CardContent>

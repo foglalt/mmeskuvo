@@ -36,18 +36,16 @@ export function AdminSidebar() {
 
   return (
     <aside className="w-64 bg-gray-900 text-white min-h-screen flex flex-col">
-      {/* Header */}
       <div className="p-4 border-b border-gray-800">
-        <h1 className="font-serif text-xl">Wedding Admin</h1>
+        <h1 className="font-serif text-xl">Esküvő Admin</h1>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
-            
+
             return (
               <li key={item.href}>
                 <Link
@@ -68,7 +66,6 @@ export function AdminSidebar() {
         </ul>
       </nav>
 
-      {/* Footer */}
       <div className="p-4 border-t border-gray-800">
         <Link
           href="/"

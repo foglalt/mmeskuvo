@@ -7,8 +7,8 @@
   --color-accent: #8b7355;
   
   /* Fonts - set by next/font */
-  --font-heading: "Playfair Display", serif;
-  --font-body: "Lora", sans-serif;
+  --font-heading: var(--font-playfair-display);
+  --font-body: var(--font-lora);
   
   --background: #ffffff;
   --foreground: #171717;

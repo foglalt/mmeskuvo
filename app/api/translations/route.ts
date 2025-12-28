@@ -14,6 +14,14 @@ const defaultTranslations: { hu: TranslationMap; en: TranslationMap } = {
   en: enFallback as TranslationMap,
 };
 
+const mergeTranslations = (fallback: TranslationMap, current: TranslationMap) => {
+  const merged = { ...fallback, ...current };
+  const hasMissingKeys = Object.keys(fallback).some(
+    (key) => !Object.prototype.hasOwnProperty.call(current, key)
+  );
+  return { merged, hasMissingKeys };
+};
+
 async function getOrCreateTranslation(
   id: "hu" | "en",
   fallback: TranslationMap
@@ -22,7 +30,16 @@ async function getOrCreateTranslation(
   const existing = await prisma.translation.findUnique({ where: { id } });
 
   if (existing?.content && typeof existing.content === "object" && !Array.isArray(existing.content)) {
-    return existing.content as TranslationMap;
+    const current = existing.content as TranslationMap;
+    const { merged, hasMissingKeys } = mergeTranslations(fallback, current);
+    if (hasMissingKeys) {
+      const updated = await prisma.translation.update({
+        where: { id },
+        data: { content: toJson(merged) },
+      });
+      return updated.content as TranslationMap;
+    }
+    return current;
   }
 
   if (!existing) {
