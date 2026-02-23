@@ -18,7 +18,8 @@ const defaultContent = {
     showScrollHint: true,
   },
   info: {
-    mainText: "# Hamarosan\n\nAz eskuvoi informaciok hamarosan elerhetok lesznek.",
+    mainText:
+      "# Udvozlunk!\n\nItt talalod az eskuvonk legfontosabb informacioit, a visszajelzeshez es a tamogatasi lehetosegekhez gorgetve.",
     subsections: [],
   },
   support: {
@@ -96,7 +97,8 @@ export async function PUT(request: NextRequest) {
           showScrollHint: true,
         },
         info: validated.data.info || {
-          mainText: "# Hamarosan\n\nAz eskuvoi informaciok hamarosan elerhetok lesznek.",
+          mainText:
+            "# Udvozlunk!\n\nItt talalod az eskuvonk legfontosabb informacioit, a visszajelzeshez es a tamogatasi lehetosegekhez gorgetve.",
           subsections: [],
         },
         support: validated.data.support || {

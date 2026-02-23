@@ -1,60 +1,135 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Providers } from "./providers";
-import { LanguageToggle } from "@/components/layout/LanguageToggle";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { LanguagePrompt } from "@/components/layout/LanguagePrompt";
+import { HeroSection } from "@/components/sections/HeroSection";
+import { InfoSection } from "@/components/sections/InfoSection";
+import { RsvpSection } from "@/components/sections/RsvpSection";
+import { SupportSection } from "@/components/sections/SupportSection";
+import { AboutSection } from "@/components/sections/AboutSection";
 import { useLanguage } from "@/hooks/useLanguage";
+import type { SiteContent, ThemeConfig } from "@/types/content";
 
-const copy = {
-  hu: {
-    title: "Hamarosan",
-    subtitle: "Kérünk, nézz vissza később!",
-    message:
-      "A weboldal jelenleg fejlesztés alatt áll. Dolgozunk a részleteken, hogy minden információ a helyére kerüljön.",
-    note: "Köszönjük a türelmedet és a megértésedet.",
+// Default content for initial render
+const defaultContent: Omit<SiteContent, "id" | "updatedAt"> = {
+  theme: {
+    primary: "#d4a574",
+    secondary: "#f5f0e8",
+    accent: "#8b7355",
+    fontHeading: "Playfair Display",
+    fontBody: "Lora",
   },
-  en: {
-    title: "Coming soon",
-    subtitle: "Please come back later!",
-    message:
-      "This website is currently under construction. We are polishing the details so everything is ready for you.",
-    note: "Thank you for your patience and understanding.",
+  hero: {
+    invitationImage: "/images/invitation-placeholder.svg",
+    showScrollHint: true,
   },
-} as const;
+  info: {
+    mainText:
+      "# Udvozlunk!\n\nItt talalod az eskuvonk legfontosabb informacioit, a visszajelzeshez es a tamogatasi lehetosegekhez gorgetve.",
+    subsections: [],
+  },
+  support: {
+    intro: "",
+    options: [],
+    volunteerOptions: [],
+  },
+  about: {
+    story: "",
+    images: [],
+  },
+};
 
-function LandingPage() {
-  const { language, setLanguage } = useLanguage();
-  const content = copy[language];
+function HomePage() {
+  const { language, setLanguage, t } = useLanguage();
+
+  const navItems = [
+    { href: "#info", label: t("nav.info") },
+    { href: "#rsvp", label: t("nav.rsvp") },
+    { href: "#support", label: t("nav.support") },
+    { href: "#about", label: t("nav.about") },
+  ];
+
+  const rsvpTranslations = {
+    title: t("rsvp.title"),
+    nameLabel: t("rsvp.name"),
+    namePlaceholder: t("rsvp.namePlaceholder"),
+    addGuest: t("rsvp.addGuest"),
+    phoneLabel: t("rsvp.phone"),
+    phonePlaceholder: t("rsvp.phonePlaceholder"),
+    accommodation: t("rsvp.accommodation"),
+    transport: t("rsvp.transport"),
+    volunteerTitle: t("rsvp.volunteerTitle"),
+    commentsLabel: t("rsvp.commentsLabel"),
+    commentsPlaceholder: t("rsvp.comments"),
+    supportLink: t("rsvp.supportLink"),
+    submit: t("rsvp.submit"),
+    success: t("rsvp.success"),
+    error: t("rsvp.error"),
+  };
+
+  const [content, setContent] = useState(defaultContent);
+
+  useEffect(() => {
+    fetch("/api/content")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && !data.error) {
+          setContent(data);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-secondary/70 via-white to-secondary/30 px-6 py-12">
-      <div className="mx-auto flex max-w-3xl flex-col">
-        <div className="flex items-center justify-end">
-          <LanguageToggle language={language} onChange={setLanguage} />
-        </div>
+    <>
+      <LanguagePrompt />
+      <Navbar
+        items={navItems}
+        language={language}
+        onLanguageChange={setLanguage}
+      />
 
-        <div className="mt-16 rounded-3xl border border-secondary/60 bg-white/80 p-8 shadow-lg backdrop-blur md:p-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent">
-            {content.title}
-          </p>
-          <h1 className="mt-4 font-serif text-3xl text-primary md:text-4xl">
-            {content.subtitle}
-          </h1>
-          <p className="mt-6 text-base text-gray-700 md:text-lg">
-            {content.message}
-          </p>
-          <p className="mt-4 text-sm text-gray-500 md:text-base">
-            {content.note}
-          </p>
-        </div>
-      </div>
-    </main>
+      <main className="pt-16">
+        <HeroSection content={content.hero} />
+        <InfoSection content={content.info} />
+        <RsvpSection
+          volunteerOptions={content.support.volunteerOptions}
+          language={language}
+          translations={rsvpTranslations}
+        />
+        <SupportSection
+          content={content.support}
+          title={t("support.title")}
+          moreInfoLabel={t("support.moreInfo")}
+        />
+        <AboutSection content={content.about} title={t("about.title")} />
+      </main>
+
+      <Footer />
+    </>
   );
 }
 
 export default function Home() {
+  const [theme, setTheme] = useState<ThemeConfig>(defaultContent.theme);
+
+  useEffect(() => {
+    fetch("/api/content")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.theme) {
+          setTheme(data.theme);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
   return (
-    <Providers>
-      <LandingPage />
+    <Providers theme={theme}>
+      <HomePage />
     </Providers>
   );
 }
