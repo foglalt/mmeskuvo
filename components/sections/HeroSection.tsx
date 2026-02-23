@@ -31,21 +31,21 @@ export function HeroSection({ content }: HeroSectionProps) {
   return (
     <section
       id="hero"
-      className="relative flex min-h-screen items-center justify-center"
+      className="relative h-[calc(100svh-4rem)] overflow-hidden md:flex md:h-auto md:min-h-screen md:items-center md:justify-center"
     >
       {/* Background/Invitation Image */}
-      <div className="relative h-full w-full max-w-2xl mx-auto px-4">
+      <div className="relative h-full w-full md:mx-auto md:max-w-2xl md:px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative aspect-[3/4] w-full"
+          className="relative h-full w-full md:h-auto md:aspect-[3/4]"
         >
           <Image
             src={invitationImage}
             alt="Wedding Invitation"
             fill
-            className="object-contain"
+            className="object-cover md:object-contain"
             priority
             sizes="(max-width: 768px) 100vw, 50vw"
           />
