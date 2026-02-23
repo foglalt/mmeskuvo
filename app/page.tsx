@@ -13,6 +13,17 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { SiteContent, ThemeConfig } from "@/types/content";
 
+const PLACEHOLDER_INVITATION_IMAGES = new Set([
+  "",
+  "/images/invitation-placeholder.svg",
+  "/images/invitation-placeholder.jpg",
+]);
+
+const DEFAULT_INVITATION_IMAGES = {
+  hu: "/images/invitation-hu.jpg",
+  en: "/images/invitation-en.jpg",
+} as const;
+
 // Default content for initial render
 const defaultContent: Omit<SiteContent, "id" | "updatedAt"> = {
   theme: {
@@ -72,6 +83,10 @@ function HomePage() {
 
   const [content, setContent] = useState(defaultContent);
 
+  const heroImage = PLACEHOLDER_INVITATION_IMAGES.has(content.hero.invitationImage)
+    ? DEFAULT_INVITATION_IMAGES[language]
+    : content.hero.invitationImage;
+
   useEffect(() => {
     fetch("/api/content")
       .then((res) => res.json())
@@ -93,7 +108,9 @@ function HomePage() {
       />
 
       <main className="pt-16">
-        <HeroSection content={content.hero} />
+        <HeroSection
+          content={{ ...content.hero, invitationImage: heroImage }}
+        />
         <InfoSection content={content.info} />
         <RsvpSection
           volunteerOptions={content.support.volunteerOptions}

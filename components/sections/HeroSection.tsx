@@ -9,8 +9,12 @@ interface HeroSectionProps {
   content: HeroContent;
 }
 
-const FALLBACK_INVITATION_IMAGE = "/images/invitation-placeholder.svg";
-const LEGACY_PLACEHOLDER_IMAGE = "/images/invitation-placeholder.jpg";
+const FALLBACK_INVITATION_IMAGE = "/images/invitation-hu.jpg";
+const PLACEHOLDER_INVITATION_IMAGES = new Set([
+  "",
+  "/images/invitation-placeholder.svg",
+  "/images/invitation-placeholder.jpg",
+]);
 
 export function HeroSection({ content }: HeroSectionProps) {
   const scrollToNext = () => {
@@ -20,7 +24,7 @@ export function HeroSection({ content }: HeroSectionProps) {
 
   const invitationImage =
     content.invitationImage &&
-    content.invitationImage !== LEGACY_PLACEHOLDER_IMAGE
+    !PLACEHOLDER_INVITATION_IMAGES.has(content.invitationImage)
       ? content.invitationImage
       : FALLBACK_INVITATION_IMAGE;
 
