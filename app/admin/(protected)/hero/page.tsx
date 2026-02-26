@@ -36,11 +36,14 @@ export default function EditHeroPage() {
     setIsSaving(true);
     setSaved(false);
     try {
-      await fetch("/api/content", {
+      const response = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ hero: content }),
       });
+      if (!response.ok) {
+        throw new Error("Failed to save hero content");
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {

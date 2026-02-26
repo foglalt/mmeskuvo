@@ -17,6 +17,9 @@ export default function RsvpListPage() {
   const fetchSubmissions = async () => {
     try {
       const res = await fetch("/api/rsvp");
+      if (!res.ok) {
+        throw new Error("Failed to fetch RSVPs");
+      }
       const data = await res.json();
       if (Array.isArray(data)) {
         setSubmissions(data);
@@ -32,8 +35,11 @@ export default function RsvpListPage() {
     if (!confirm("Biztosan törölni szeretnéd?")) return;
 
     try {
-      await fetch(`/api/rsvp/${id}`, { method: "DELETE" });
-      setSubmissions(submissions.filter((s) => s.id !== id));
+      const response = await fetch(`/api/rsvp/${id}`, { method: "DELETE" });
+      if (!response.ok) {
+        throw new Error("Failed to delete RSVP");
+      }
+      setSubmissions((current) => current.filter((s) => s.id !== id));
     } catch (error) {
       console.error("Failed to delete:", error);
     }

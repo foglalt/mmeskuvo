@@ -6,7 +6,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!isAuthenticated()) {
+  const authenticated = await isAuthenticated();
+  if (!authenticated) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

@@ -32,11 +32,14 @@ export default function EditThemePage() {
     setIsSaving(true);
     setSaved(false);
     try {
-      await fetch("/api/content", {
+      const response = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ theme }),
       });
+      if (!response.ok) {
+        throw new Error("Failed to save theme");
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
