@@ -4,6 +4,15 @@ import { siteContentSchema } from "@/lib/validations";
 import { verifyAuth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+const DEFAULT_ABOUT_IMAGES = [
+  { src: "/images/us1.jpeg" },
+  { src: "/images/us2.jpg" },
+  { src: "/images/us3.jpeg" },
+  { src: "/images/us4.jpg" },
+  { src: "/images/us5.jpg" },
+  { src: "/images/us6.jpeg" },
+] as const;
+
 const defaultContent = {
   id: "main",
   theme: {
@@ -29,7 +38,7 @@ const defaultContent = {
   },
   about: {
     story: "",
-    images: [],
+    images: [...DEFAULT_ABOUT_IMAGES],
   },
 };
 
@@ -108,7 +117,7 @@ export async function PUT(request: NextRequest) {
         },
         about: validated.data.about || {
           story: "",
-          images: [],
+          images: [...DEFAULT_ABOUT_IMAGES],
         },
       },
     });

@@ -24,6 +24,15 @@ const DEFAULT_INVITATION_IMAGES = {
   en: "/images/invitation-en.jpg",
 } as const;
 
+const DEFAULT_ABOUT_IMAGES = [
+  { src: "/images/us1.jpeg" },
+  { src: "/images/us2.jpg" },
+  { src: "/images/us3.jpeg" },
+  { src: "/images/us4.jpg" },
+  { src: "/images/us5.jpg" },
+  { src: "/images/us6.jpeg" },
+] as const;
+
 // Default content for initial render
 const defaultContent: Omit<SiteContent, "id" | "updatedAt"> = {
   theme: {
@@ -49,7 +58,7 @@ const defaultContent: Omit<SiteContent, "id" | "updatedAt"> = {
   },
   about: {
     story: "",
-    images: [],
+    images: [...DEFAULT_ABOUT_IMAGES],
   },
 };
 
@@ -86,6 +95,10 @@ function HomePage() {
   const heroImage = PLACEHOLDER_INVITATION_IMAGES.has(content.hero.invitationImage)
     ? DEFAULT_INVITATION_IMAGES[language]
     : content.hero.invitationImage;
+  const aboutContent =
+    content.about.images?.length > 0
+      ? content.about
+      : { ...content.about, images: [...DEFAULT_ABOUT_IMAGES] };
 
   useEffect(() => {
     fetch("/api/content")
@@ -122,7 +135,7 @@ function HomePage() {
           title={t("support.title")}
           moreInfoLabel={t("support.moreInfo")}
         />
-        <AboutSection content={content.about} title={t("about.title")} />
+        <AboutSection content={aboutContent} title={t("about.title")} />
       </main>
 
       <Footer />

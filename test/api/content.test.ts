@@ -39,6 +39,8 @@ describe("GET /api/content", () => {
 
     expect(data.id).toBe("main");
     expect(data.hero.invitationImage).toBe("/images/invitation-placeholder.svg");
+    expect(data.about.images).toHaveLength(6);
+    expect(data.about.images[0].src).toBe("/images/us1.jpeg");
   });
 
   it("returns default content when prisma throws", async () => {
@@ -50,5 +52,7 @@ describe("GET /api/content", () => {
 
     expect(data.id).toBe("main");
     expect(data.hero.invitationImage).toBe("/images/invitation-placeholder.svg");
+    expect(data.about.images).toHaveLength(6);
+    expect(data.about.images[0].src).toBe("/images/us1.jpeg");
   });
 });
