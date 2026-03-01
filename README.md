@@ -27,8 +27,11 @@ Public wedding website and admin dashboard built with Next.js App Router, Prisma
 ## Scripts
 - `npm run dev`
 - `npm run build`
+- `npm run build:vercel` (runs `prisma migrate deploy` then `next build`)
 - `npm run lint`
 - `npm run test`
+- `npm run db:deploy`
+- `npm run db:push`
 
 ## Git Hooks
 - `npm run hooks:install` to enable the pre-commit hook (runs lint + build + test)

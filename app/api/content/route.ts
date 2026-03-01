@@ -51,7 +51,10 @@ export async function GET() {
     });
 
     if (!content) {
-      return NextResponse.json(defaultContent);
+      const created = await prisma.siteContent.create({
+        data: defaultContent,
+      });
+      return NextResponse.json(created);
     }
 
     return NextResponse.json(content);
