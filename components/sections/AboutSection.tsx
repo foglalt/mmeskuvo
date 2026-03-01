@@ -2,6 +2,7 @@ import { SectionWrapper } from "@/components/content/SectionWrapper";
 import { MarkdownRenderer } from "@/components/content/MarkdownRenderer";
 import { ImageGallery } from "@/components/content/ImageGallery";
 import { localizeText } from "@/lib/localizedContent";
+import { formatImageDateFromPath, sortGalleryItemsByDate } from "@/lib/imageDates";
 import type { AboutContent, LanguageCode } from "@/types/content";
 
 interface AboutSectionProps {
@@ -16,9 +17,11 @@ export function AboutSection({
   language = "hu",
 }: AboutSectionProps) {
   const localizedStory = localizeText(content.story, language);
-  const localizedImages = content.images.map((image) => ({
+  const localizedImages = sortGalleryItemsByDate(content.images).map((image) => ({
     src: image.src,
-    caption: image.caption ? localizeText(image.caption, language) : undefined,
+    caption:
+      formatImageDateFromPath(image.src, language) ??
+      (image.caption ? localizeText(image.caption, language) : undefined),
   }));
 
   return (

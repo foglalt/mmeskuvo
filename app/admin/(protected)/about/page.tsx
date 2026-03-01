@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Button, Textarea, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { normalizeAboutContent } from "@/lib/localizedContent";
+import { formatImageDateFromPath, sortGalleryItemsByDate } from "@/lib/imageDates";
 import { Save, Trash2, ArrowUp, ArrowDown, Check } from "lucide-react";
 import type { AboutContent, LanguageCode } from "@/types/content";
 
@@ -25,7 +26,11 @@ export default function EditAboutPage() {
     ])
       .then(([contentData, imagesData]) => {
         if (contentData?.about) {
-          setContent(normalizeAboutContent(contentData.about));
+          const normalizedAbout = normalizeAboutContent(contentData.about);
+          setContent({
+            ...normalizedAbout,
+            images: sortGalleryItemsByDate(normalizedAbout.images),
+          });
         }
         if (imagesData?.images) {
           setAvailableImages(imagesData.images);
@@ -57,9 +62,15 @@ export default function EditAboutPage() {
 
   const addImage = (src: string) => {
     if (!content.images.some((img) => img.src === src)) {
+      const dateCaptionHu = formatImageDateFromPath(src, "hu") ?? "";
+      const dateCaptionEn = formatImageDateFromPath(src, "en") ?? dateCaptionHu;
+
       setContent({
         ...content,
-        images: [...content.images, { src, caption: { hu: "", en: "" } }],
+        images: sortGalleryItemsByDate([
+          ...content.images,
+          { src, caption: { hu: dateCaptionHu, en: dateCaptionEn } },
+        ]),
       });
     }
   };
