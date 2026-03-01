@@ -11,13 +11,24 @@ import {
 } from "@/lib/localizedContent";
 
 const DEFAULT_ABOUT_IMAGES = [
-  { src: "/images/us1.jpeg" },
-  { src: "/images/us2.jpg" },
-  { src: "/images/us3.jpeg" },
-  { src: "/images/us4.jpg" },
-  { src: "/images/us5.jpg" },
-  { src: "/images/us6.jpeg" },
+  { src: "/images/2024_12_21.jpg" },
+  { src: "/images/2025_02_05.jpg" },
+  { src: "/images/2025_04_20.jpg" },
+  { src: "/images/2025_06_22.jpg" },
+  { src: "/images/2025_07_15.jpg" },
+  { src: "/images/2025_10_06.jpg" },
+  { src: "/images/2025_10_26.jpg" },
+  { src: "/images/2025_11_09.jpg" },
 ] as const;
+
+const LEGACY_ABOUT_IMAGE_SOURCES = new Set([
+  "/images/us1.jpeg",
+  "/images/us2.jpg",
+  "/images/us3.jpeg",
+  "/images/us4.jpg",
+  "/images/us5.jpg",
+  "/images/us6.jpeg",
+]);
 
 const defaultContent = {
   id: "main",
@@ -81,6 +92,19 @@ export async function GET() {
       support: normalizeSupportContent(content.support),
       about: normalizeAboutContent(content.about),
     };
+
+    const hasOnlyLegacyAboutImages =
+      normalized.about.images.length > 0 &&
+      normalized.about.images.every((image) =>
+        LEGACY_ABOUT_IMAGE_SOURCES.has(image.src)
+      );
+
+    if (hasOnlyLegacyAboutImages) {
+      normalized.about = {
+        ...normalized.about,
+        images: [...DEFAULT_ABOUT_IMAGES],
+      };
+    }
 
     const contentChanged =
       JSON.stringify(content.info) !== JSON.stringify(normalized.info) ||

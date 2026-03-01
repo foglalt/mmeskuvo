@@ -48,12 +48,14 @@ const createPrismaStub = (result: unknown, shouldThrow = false): PrismaStub => {
           about: {
             story: "",
             images: [
-              { src: "/images/us1.jpeg" },
-              { src: "/images/us2.jpg" },
-              { src: "/images/us3.jpeg" },
-              { src: "/images/us4.jpg" },
-              { src: "/images/us5.jpg" },
-              { src: "/images/us6.jpeg" },
+              { src: "/images/2024_12_21.jpg" },
+              { src: "/images/2025_02_05.jpg" },
+              { src: "/images/2025_04_20.jpg" },
+              { src: "/images/2025_06_22.jpg" },
+              { src: "/images/2025_07_15.jpg" },
+              { src: "/images/2025_10_06.jpg" },
+              { src: "/images/2025_10_26.jpg" },
+              { src: "/images/2025_11_09.jpg" },
             ],
           },
         };
@@ -82,8 +84,8 @@ describe("GET /api/content", () => {
 
     expect(data.id).toBe("main");
     expect(data.hero.invitationImage).toBe("/images/invitation-placeholder.svg");
-    expect(data.about.images).toHaveLength(6);
-    expect(data.about.images[0].src).toBe("/images/us1.jpeg");
+    expect(data.about.images).toHaveLength(8);
+    expect(data.about.images[0].src).toBe("/images/2024_12_21.jpg");
     expect(prismaStub.siteContent.create).toHaveBeenCalledTimes(1);
   });
 
@@ -96,7 +98,7 @@ describe("GET /api/content", () => {
 
     expect(data.id).toBe("main");
     expect(data.hero.invitationImage).toBe("/images/invitation-placeholder.svg");
-    expect(data.about.images).toHaveLength(6);
-    expect(data.about.images[0].src).toBe("/images/us1.jpeg");
+    expect(data.about.images).toHaveLength(8);
+    expect(data.about.images[0].src).toBe("/images/2024_12_21.jpg");
   });
 });
