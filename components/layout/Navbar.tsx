@@ -14,11 +14,29 @@ interface NavbarProps {
 export function Navbar({ items, language, onLanguageChange }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const scrollToSection = (href: string) => {
+    if (!href.startsWith("#")) return;
+
+    const sectionId = href.slice(1);
+    const element = document.getElementById(sectionId);
+    if (!element) return;
+
+    const fixedNavbarHeight = 64;
+    const top =
+      element.getBoundingClientRect().top + window.scrollY - fixedNavbarHeight;
+
+    window.scrollTo({
+      top: Math.max(top, 0),
+      behavior: "smooth",
+    });
+  };
+
   const handleNavClick = (href: string) => {
     setIsOpen(false);
-    // Smooth scroll to section
-    const element = document.querySelector(href);
-    element?.scrollIntoView({ behavior: "smooth" });
+    // Wait for the mobile menu to start closing, then scroll reliably.
+    window.setTimeout(() => {
+      scrollToSection(href);
+    }, 50);
   };
 
   return (
