@@ -1,0 +1,16 @@
+{
+  "mode": "autopilot",
+  "git": {
+    "commit_docs": true
+  },
+  "workflow": {
+    "style": "phase-plan",
+    "brownfield_auto_map_if_untouched": true,
+    "run_checks_after_execute": true
+  },
+  "memory": {
+    "auto_compact": true,
+    "state_max_lines": 220,
+    "recent_decisions_to_keep": 7
+  }
+}
