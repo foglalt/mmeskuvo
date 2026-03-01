@@ -22,6 +22,19 @@ interface RsvpSectionProps {
     submit: string;
     success: string;
     error: string;
+    alreadySubmittedTitle: string;
+    alreadySubmittedDescription: string;
+    modify: string;
+    summaryName: string;
+    summaryAdditionalGuests: string;
+    summaryPhone: string;
+    summaryAccommodation: string;
+    summaryTransport: string;
+    summaryVolunteer: string;
+    summaryComments: string;
+    summaryYes: string;
+    summaryNo: string;
+    summaryNone: string;
   };
 }
 

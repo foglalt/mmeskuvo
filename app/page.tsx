@@ -91,6 +91,19 @@ function HomePage() {
     submit: t("rsvp.submit"),
     success: t("rsvp.success"),
     error: t("rsvp.error"),
+    alreadySubmittedTitle: t("rsvp.alreadySubmittedTitle"),
+    alreadySubmittedDescription: t("rsvp.alreadySubmittedDescription"),
+    modify: t("rsvp.modify"),
+    summaryName: t("rsvp.summaryName"),
+    summaryAdditionalGuests: t("rsvp.summaryAdditionalGuests"),
+    summaryPhone: t("rsvp.summaryPhone"),
+    summaryAccommodation: t("rsvp.summaryAccommodation"),
+    summaryTransport: t("rsvp.summaryTransport"),
+    summaryVolunteer: t("rsvp.summaryVolunteer"),
+    summaryComments: t("rsvp.summaryComments"),
+    summaryYes: t("rsvp.summaryYes"),
+    summaryNo: t("rsvp.summaryNo"),
+    summaryNone: t("rsvp.summaryNone"),
   };
 
   const [content, setContent] = useState(defaultContent);
