@@ -1,3 +1,10 @@
+export type LanguageCode = "hu" | "en";
+
+export interface LocalizedText {
+  hu: string;
+  en: string;
+}
+
 // Theme configuration
 export interface ThemeConfig {
   primary: string;      // Hex color, e.g., "#d4a574"
@@ -15,36 +22,36 @@ export interface HeroContent {
 
 // Info section
 export interface InfoSubsection {
-  title: string;
-  content: string;  // Markdown
+  title: LocalizedText;
+  content: LocalizedText;  // Markdown
 }
 
 export interface InfoContent {
-  mainText: string;  // Markdown
+  mainText: LocalizedText;  // Markdown
   subsections: InfoSubsection[];
 }
 
 // Support section
 export interface SupportOption {
-  title: string;
-  description: string;  // Markdown
+  title: LocalizedText;
+  description: LocalizedText;  // Markdown
   link?: string;
 }
 
 export interface SupportContent {
-  intro: string;  // Markdown
+  intro: LocalizedText;  // Markdown
   options: SupportOption[];
-  volunteerOptions: string[];  // Checkbox labels
+  volunteerOptions: LocalizedText[];  // Checkbox labels
 }
 
 // About section
 export interface GalleryImage {
   src: string;      // Path in /public/images/
-  caption?: string;
+  caption?: LocalizedText;
 }
 
 export interface AboutContent {
-  story: string;  // Markdown
+  story: LocalizedText;  // Markdown
   images: GalleryImage[];
 }
 
@@ -69,7 +76,7 @@ export interface RsvpSubmission {
   needsTransport: boolean;
   volunteerOptions: string[];
   comments?: string;
-  language: "hu" | "en";
+  language: LanguageCode;
   createdAt: Date;
 }
 

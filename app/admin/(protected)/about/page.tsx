@@ -4,14 +4,16 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button, Textarea, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { AboutSection } from "@/components/sections/AboutSection";
+import { normalizeAboutContent } from "@/lib/localizedContent";
 import { Save, Trash2, ArrowUp, ArrowDown, Check } from "lucide-react";
-import type { AboutContent } from "@/types/content";
+import type { AboutContent, LanguageCode } from "@/types/content";
 
 export default function EditAboutPage() {
   const [content, setContent] = useState<AboutContent>({
-    story: "",
+    story: { hu: "", en: "" },
     images: [],
   });
+  const [activeLanguage, setActiveLanguage] = useState<LanguageCode>("hu");
   const [availableImages, setAvailableImages] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -23,7 +25,7 @@ export default function EditAboutPage() {
     ])
       .then(([contentData, imagesData]) => {
         if (contentData?.about) {
-          setContent(contentData.about);
+          setContent(normalizeAboutContent(contentData.about));
         }
         if (imagesData?.images) {
           setAvailableImages(imagesData.images);
@@ -57,14 +59,21 @@ export default function EditAboutPage() {
     if (!content.images.some((img) => img.src === src)) {
       setContent({
         ...content,
-        images: [...content.images, { src, caption: "" }],
+        images: [...content.images, { src, caption: { hu: "", en: "" } }],
       });
     }
   };
 
   const updateImageCaption = (index: number, caption: string) => {
     const updated = [...content.images];
-    updated[index] = { ...updated[index], caption };
+    const currentCaption = updated[index].caption ?? { hu: "", en: "" };
+    updated[index] = {
+      ...updated[index],
+      caption: {
+        ...currentCaption,
+        [activeLanguage]: caption,
+      },
+    };
     setContent({ ...content, images: updated });
   };
 
@@ -89,20 +98,54 @@ export default function EditAboutPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-serif text-gray-900">Rólunk</h1>
-          <Button onClick={handleSave} isLoading={isSaving}>
-            <Save className="h-4 w-4 mr-2" />
-            {saved ? "Mentve!" : "Mentés"}
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="flex rounded-lg border overflow-hidden">
+              <button
+                onClick={() => setActiveLanguage("hu")}
+                className={`px-4 py-2 text-sm font-medium ${
+                  activeLanguage === "hu"
+                    ? "bg-primary text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                Magyar
+              </button>
+              <button
+                onClick={() => setActiveLanguage("en")}
+                className={`px-4 py-2 text-sm font-medium ${
+                  activeLanguage === "en"
+                    ? "bg-primary text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                English
+              </button>
+            </div>
+            <Button onClick={handleSave} isLoading={isSaving}>
+              <Save className="h-4 w-4 mr-2" />
+              {saved ? "Mentve!" : "Mentés"}
+            </Button>
+          </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Történetünk</CardTitle>
+            <CardTitle>
+              Történetünk ({activeLanguage === "hu" ? "Magyar" : "English"})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
-              value={content.story}
-              onChange={(e) => setContent({ ...content, story: e.target.value })}
+              value={content.story[activeLanguage]}
+              onChange={(e) =>
+                setContent({
+                  ...content,
+                  story: {
+                    ...content.story,
+                    [activeLanguage]: e.target.value,
+                  },
+                })
+              }
               rows={10}
               placeholder="Hogyan ismerkedtünk meg..."
             />
@@ -133,7 +176,7 @@ export default function EditAboutPage() {
                     </div>
                     <div className="flex-1 space-y-2">
                       <Input
-                        value={img.caption || ""}
+                        value={img.caption?.[activeLanguage] ?? ""}
                         onChange={(e) => updateImageCaption(index, e.target.value)}
                         placeholder="Képaláírás..."
                       />
@@ -220,7 +263,11 @@ export default function EditAboutPage() {
       <div className="lg:sticky lg:top-8 lg:self-start">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Előnézet</h2>
         <div className="border rounded-lg overflow-hidden bg-white max-h-[80vh] overflow-auto">
-          <AboutSection content={content} title="Rólunk" />
+          <AboutSection
+            content={content}
+            language={activeLanguage}
+            title="Rólunk"
+          />
         </div>
       </div>
     </div>

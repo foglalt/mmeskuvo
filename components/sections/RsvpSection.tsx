@@ -2,10 +2,9 @@
 
 import { SectionWrapper } from "@/components/content/SectionWrapper";
 import { RsvpForm } from "@/components/forms/RsvpForm";
-import type { SupportContent } from "@/types/content";
 
 interface RsvpSectionProps {
-  volunteerOptions: SupportContent["volunteerOptions"];
+  volunteerOptions: string[];
   language: "hu" | "en";
   translations: {
     title: string;

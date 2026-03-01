@@ -12,6 +12,7 @@ import { SupportSection } from "@/components/sections/SupportSection";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { SiteContent, ThemeConfig } from "@/types/content";
+import { localizeText } from "@/lib/localizedContent";
 
 const PLACEHOLDER_INVITATION_IMAGES = new Set([
   "",
@@ -47,17 +48,19 @@ const defaultContent: Omit<SiteContent, "id" | "updatedAt"> = {
     showScrollHint: true,
   },
   info: {
-    mainText:
-      "# Udvozlunk!\n\nItt talalod az eskuvonk legfontosabb informacioit, a visszajelzeshez es a tamogatasi lehetosegekhez gorgetve.",
+    mainText: {
+      hu: "# Udvozlunk!\n\nItt talalod az eskuvonk legfontosabb informacioit, a visszajelzeshez es a tamogatasi lehetosegekhez gorgetve.",
+      en: "# Welcome!\n\nHere you can find the most important information about our wedding, RSVP details, and ways to support us.",
+    },
     subsections: [],
   },
   support: {
-    intro: "",
+    intro: { hu: "", en: "" },
     options: [],
     volunteerOptions: [],
   },
   about: {
-    story: "",
+    story: { hu: "", en: "" },
     images: [...DEFAULT_ABOUT_IMAGES],
   },
 };
@@ -99,6 +102,9 @@ function HomePage() {
     content.about.images?.length > 0
       ? content.about
       : { ...content.about, images: [...DEFAULT_ABOUT_IMAGES] };
+  const volunteerOptionsForLanguage = content.support.volunteerOptions
+    .map((option) => localizeText(option, language))
+    .filter((option) => option.trim() !== "");
 
   useEffect(() => {
     fetch("/api/content")
@@ -124,18 +130,19 @@ function HomePage() {
         <HeroSection
           content={{ ...content.hero, invitationImage: heroImage }}
         />
-        <InfoSection content={content.info} />
+        <InfoSection content={content.info} language={language} />
         <RsvpSection
-          volunteerOptions={content.support.volunteerOptions}
+          volunteerOptions={volunteerOptionsForLanguage}
           language={language}
           translations={rsvpTranslations}
         />
         <SupportSection
           content={content.support}
+          language={language}
           title={t("support.title")}
           moreInfoLabel={t("support.moreInfo")}
         />
-        <AboutSection content={aboutContent} title={t("about.title")} />
+        <AboutSection content={aboutContent} language={language} title={t("about.title")} />
       </main>
 
       <Footer />

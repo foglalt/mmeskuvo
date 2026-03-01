@@ -2,6 +2,24 @@ import { z } from "zod";
 
 // Reusable schemas
 const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be valid hex color");
+const localizedTextSchema = z
+  .union([
+    z.string(),
+    z.object({
+      hu: z.string(),
+      en: z.string(),
+    }),
+  ])
+  .transform((value) => {
+    if (typeof value === "string") {
+      return { hu: value, en: value };
+    }
+
+    return {
+      hu: value.hu ?? value.en ?? "",
+      en: value.en ?? value.hu ?? "",
+    };
+  });
 
 // Theme configuration
 export const themeSchema = z.object({
@@ -20,36 +38,36 @@ export const heroSchema = z.object({
 
 // Info section
 export const infoSubsectionSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  content: z.string(),
+  title: localizedTextSchema,
+  content: localizedTextSchema,
 });
 
 export const infoSchema = z.object({
-  mainText: z.string(),
+  mainText: localizedTextSchema,
   subsections: z.array(infoSubsectionSchema),
 });
 
 // Support section
 export const supportOptionSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string(),
+  title: localizedTextSchema,
+  description: localizedTextSchema,
   link: z.string().url().optional().or(z.literal("")),
 });
 
 export const supportSchema = z.object({
-  intro: z.string(),
+  intro: localizedTextSchema,
   options: z.array(supportOptionSchema),
-  volunteerOptions: z.array(z.string()),
+  volunteerOptions: z.array(localizedTextSchema),
 });
 
 // About section
 export const galleryImageSchema = z.object({
   src: z.string().min(1, "Image source is required"),
-  caption: z.string().optional(),
+  caption: localizedTextSchema.optional(),
 });
 
 export const aboutSchema = z.object({
-  story: z.string(),
+  story: localizedTextSchema,
   images: z.array(galleryImageSchema),
 });
 

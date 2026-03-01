@@ -1,14 +1,26 @@
 import { SectionWrapper } from "@/components/content/SectionWrapper";
 import { MarkdownRenderer } from "@/components/content/MarkdownRenderer";
 import { ImageGallery } from "@/components/content/ImageGallery";
-import type { AboutContent } from "@/types/content";
+import { localizeText } from "@/lib/localizedContent";
+import type { AboutContent, LanguageCode } from "@/types/content";
 
 interface AboutSectionProps {
   content: AboutContent;
   title: string;
+  language?: LanguageCode;
 }
 
-export function AboutSection({ content, title }: AboutSectionProps) {
+export function AboutSection({
+  content,
+  title,
+  language = "hu",
+}: AboutSectionProps) {
+  const localizedStory = localizeText(content.story, language);
+  const localizedImages = content.images.map((image) => ({
+    src: image.src,
+    caption: image.caption ? localizeText(image.caption, language) : undefined,
+  }));
+
   return (
     <SectionWrapper id="about" className="bg-white">
       <div className="text-center mb-8">
@@ -18,15 +30,15 @@ export function AboutSection({ content, title }: AboutSectionProps) {
       </div>
 
       {/* Story */}
-      {content.story && (
+      {localizedStory && (
         <div className="mb-12">
-          <MarkdownRenderer content={content.story} />
+          <MarkdownRenderer content={localizedStory} />
         </div>
       )}
 
       {/* Image Gallery */}
-      {content.images?.length > 0 && (
-        <ImageGallery images={content.images} />
+      {localizedImages.length > 0 && (
+        <ImageGallery images={localizedImages} />
       )}
     </SectionWrapper>
   );
