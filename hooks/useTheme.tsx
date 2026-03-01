@@ -19,13 +19,25 @@ export function ThemeProvider({ children, theme }: ThemeProviderProps) {
   // Apply theme to CSS variables
   useEffect(() => {
     const root = document.documentElement;
+    const body = document.body;
     const headingFont = FONT_VARIABLES[theme.fontHeading] ?? theme.fontHeading;
     const bodyFont = FONT_VARIABLES[theme.fontBody] ?? theme.fontBody;
+
+    // Colors are read across the app, keep them on both html and body for
+    // consistency in nested layout contexts.
     root.style.setProperty("--color-primary", theme.primary);
     root.style.setProperty("--color-secondary", theme.secondary);
     root.style.setProperty("--color-accent", theme.accent);
+    body.style.setProperty("--color-primary", theme.primary);
+    body.style.setProperty("--color-secondary", theme.secondary);
+    body.style.setProperty("--color-accent", theme.accent);
+
+    // Fonts rely on next/font custom properties and must resolve in the same
+    // scope where --font-heading/--font-body are defined.
     root.style.setProperty("--font-heading", headingFont);
     root.style.setProperty("--font-body", bodyFont);
+    body.style.setProperty("--font-heading", headingFont);
+    body.style.setProperty("--font-body", bodyFont);
   }, [theme]);
 
   return (

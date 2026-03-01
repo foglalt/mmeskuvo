@@ -67,11 +67,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const fontVariableClasses = `${playfairDisplay.variable} ${cormorantGaramond.variable} ${greatVibes.variable} ${lora.variable} ${merriweather.variable} ${crimsonText.variable} ${libreBaskerville.variable}`;
+
   return (
-    <html lang="hu" className="scroll-smooth">
-      <body
-        className={`${playfairDisplay.variable} ${cormorantGaramond.variable} ${greatVibes.variable} ${lora.variable} ${merriweather.variable} ${crimsonText.variable} ${libreBaskerville.variable} antialiased`}
-      >
+    <html lang="hu" className={`${fontVariableClasses} scroll-smooth`}>
+      <body className="antialiased">
         {children}
       </body>
     </html>
