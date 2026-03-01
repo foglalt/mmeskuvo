@@ -17,6 +17,11 @@ export function Navbar({ items, language, onLanguageChange }: NavbarProps) {
   const scrollToSection = (href: string) => {
     if (!href.startsWith("#")) return;
 
+    if (href === "#hero") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     const sectionId = href.slice(1);
     const element = document.getElementById(sectionId);
     if (!element) return;
