@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Home,
-  Image,
   FileText,
   Heart,
   Users,
@@ -17,7 +16,6 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: Home },
-  { href: "/admin/hero", label: "Hero / Meghívó", icon: Image },
   { href: "/admin/info", label: "Információk", icon: FileText },
   { href: "/admin/support", label: "Támogatás", icon: Heart },
   { href: "/admin/about", label: "Rólunk", icon: Users },
