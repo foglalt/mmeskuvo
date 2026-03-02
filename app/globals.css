@@ -25,6 +25,11 @@ body {
   font-family: var(--font-body), sans-serif;
 }
 
+/* Keep all checkboxes in the site's color system */
+input[type="checkbox"] {
+  accent-color: var(--color-primary);
+}
+
 /* Custom prose styles for markdown */
 .prose-wedding {
   max-width: none;
