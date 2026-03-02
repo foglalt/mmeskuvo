@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAuthenticated } from "@/lib/auth";
+import { verifyAuth } from "@/lib/auth";
 import { getPrisma } from "@/lib/db";
 import { rsvpResolutionUpdateSchema } from "@/lib/validations";
 
@@ -7,8 +7,8 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authenticated = await isAuthenticated();
-  if (!authenticated) {
+  const authResult = await verifyAuth(request);
+  if (!authResult.success) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -30,12 +30,12 @@ export async function DELETE(
   }
 }
 
-export async function PATCH(
+async function handleUpdate(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const authenticated = await isAuthenticated();
-  if (!authenticated) {
+  const authResult = await verifyAuth(request);
+  if (!authResult.success) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -65,4 +65,18 @@ export async function PATCH(
       { status: 500 }
     );
   }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  return handleUpdate(request, context);
+}
+
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  return handleUpdate(request, context);
 }

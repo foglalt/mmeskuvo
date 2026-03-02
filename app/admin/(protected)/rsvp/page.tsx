@@ -5,6 +5,8 @@ import { Card, CardContent, Button, Textarea } from "@/components/ui";
 import { Download, Trash2, Users, Car, Home, Heart } from "lucide-react";
 import type { RsvpSubmission } from "@/types/content";
 
+const MAX_ADMIN_COMMENT_LENGTH = 2000;
+
 const formatHungarianMonthDay = (date: Date | string) => {
   const parsed = typeof date === "string" ? new Date(date) : date;
   const parts = new Intl.DateTimeFormat("hu-HU", {
@@ -99,13 +101,17 @@ export default function RsvpListPage() {
     setUpdatingKey(`${id}:${field}`);
     try {
       const response = await fetch(`/api/rsvp/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ [field]: value }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update resolution status");
+        const errorPayload = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        throw new Error(errorPayload?.error || "Failed to update resolution status");
       }
 
       const updated = (await response.json()) as RsvpSubmission;
@@ -126,18 +132,23 @@ export default function RsvpListPage() {
   };
 
   const updateAdminComment = async (id: string, adminComment: string) => {
+    const normalizedComment = adminComment.slice(0, MAX_ADMIN_COMMENT_LENGTH);
     setUpdatingKey(`${id}:adminComment`);
     try {
       const response = await fetch(`/api/rsvp/${id}`, {
-        method: "PATCH",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({
-          adminComment,
+          adminComment: normalizedComment,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update admin comment");
+        const errorPayload = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        throw new Error(errorPayload?.error || "Failed to update admin comment");
       }
 
       const updated = (await response.json()) as RsvpSubmission;
@@ -157,9 +168,18 @@ export default function RsvpListPage() {
     }
   };
 
-  const handleAdminCommentBlur = (submission: RsvpSubmission) => {
-    const draft = adminCommentDrafts[submission.id] ?? "";
+  const handleAdminCommentBlur = (
+    submission: RsvpSubmission,
+    valueFromBlur: string
+  ) => {
+    const draft = valueFromBlur.slice(0, MAX_ADMIN_COMMENT_LENGTH);
     const saved = submission.adminComment ?? "";
+    if (valueFromBlur !== draft) {
+      setAdminCommentDrafts((current) => ({
+        ...current,
+        [submission.id]: draft,
+      }));
+    }
     if (draft === saved) return;
     void updateAdminComment(submission.id, draft);
   };
@@ -435,10 +455,13 @@ export default function RsvpListPage() {
                           [submission.id]: event.target.value,
                         }))
                       }
-                      onBlur={() => handleAdminCommentBlur(submission)}
+                      onBlur={(event) =>
+                        handleAdminCommentBlur(submission, event.currentTarget.value)
+                      }
                       placeholder="Admin megjegyzés..."
                       rows={2}
                       className="min-h-0 text-xs py-1.5"
+                      maxLength={MAX_ADMIN_COMMENT_LENGTH}
                       disabled={updatingKey === `${submission.id}:adminComment`}
                     />
                   </td>

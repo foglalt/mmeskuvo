@@ -2,18 +2,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DELETE } from "@/app/api/rsvp/[id]/route";
 import { getPrisma } from "@/lib/db";
-import { isAuthenticated } from "@/lib/auth";
+import { verifyAuth } from "@/lib/auth";
 
 vi.mock("@/lib/db", () => ({
   getPrisma: vi.fn(),
 }));
 
 vi.mock("@/lib/auth", () => ({
-  isAuthenticated: vi.fn(),
+  verifyAuth: vi.fn(),
 }));
 
 const mockedGetPrisma = vi.mocked(getPrisma);
-const mockedIsAuthenticated = vi.mocked(isAuthenticated);
+const mockedVerifyAuth = vi.mocked(verifyAuth);
 
 type PrismaStub = {
   rsvpSubmission: {
@@ -24,11 +24,11 @@ type PrismaStub = {
 describe("DELETE /api/rsvp/[id]", () => {
   beforeEach(() => {
     mockedGetPrisma.mockReset();
-    mockedIsAuthenticated.mockReset();
+    mockedVerifyAuth.mockReset();
   });
 
   it("returns 401 when not authenticated", async () => {
-    mockedIsAuthenticated.mockResolvedValue(false);
+    mockedVerifyAuth.mockResolvedValue({ success: false });
 
     const response = await DELETE(
       {} as Parameters<typeof DELETE>[0],
@@ -50,7 +50,7 @@ describe("DELETE /api/rsvp/[id]", () => {
       },
     };
 
-    mockedIsAuthenticated.mockResolvedValue(true);
+    mockedVerifyAuth.mockResolvedValue({ success: true });
     mockedGetPrisma.mockReturnValue(
       prismaStub as unknown as ReturnType<typeof getPrisma>
     );
@@ -69,4 +69,3 @@ describe("DELETE /api/rsvp/[id]", () => {
     });
   });
 });
-
