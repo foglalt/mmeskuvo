@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button, Textarea, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { SupportSection } from "@/components/sections/SupportSection";
 import { normalizeSupportContent } from "@/lib/localizedContent";
+import { useSaveShortcut } from "@/hooks/useSaveShortcut";
 import { Save, Plus, Trash2 } from "lucide-react";
 import type { LanguageCode, SupportContent } from "@/types/content";
 
@@ -49,6 +50,8 @@ export default function EditSupportPage() {
       setIsSaving(false);
     }
   };
+
+  useSaveShortcut(handleSave, { enabled: !isSaving });
 
   const addOption = () => {
     setContent({

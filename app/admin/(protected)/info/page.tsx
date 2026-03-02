@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button, Textarea, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { InfoSection } from "@/components/sections/InfoSection";
 import { normalizeInfoContent } from "@/lib/localizedContent";
+import { useSaveShortcut } from "@/hooks/useSaveShortcut";
 import { Save, Plus, Trash2 } from "lucide-react";
 import type { InfoContent, LanguageCode } from "@/types/content";
 
@@ -47,6 +48,8 @@ export default function EditInfoPage() {
       setIsSaving(false);
     }
   };
+
+  useSaveShortcut(handleSave, { enabled: !isSaving });
 
   const addSubsection = () => {
     setContent({

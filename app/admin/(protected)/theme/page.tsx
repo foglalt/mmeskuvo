@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { useSaveShortcut } from "@/hooks/useSaveShortcut";
 import { Save } from "lucide-react";
 import type { ThemeConfig } from "@/types/content";
 import { FONT_OPTIONS } from "@/lib/fonts";
@@ -48,6 +49,8 @@ export default function EditThemePage() {
       setIsSaving(false);
     }
   };
+
+  useSaveShortcut(handleSave, { enabled: !isSaving });
 
   return (
     <div className="max-w-2xl">

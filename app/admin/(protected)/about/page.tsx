@@ -6,6 +6,7 @@ import { Button, Textarea, Input, Card, CardHeader, CardTitle, CardContent } fro
 import { AboutSection } from "@/components/sections/AboutSection";
 import { normalizeAboutContent } from "@/lib/localizedContent";
 import { formatImageDateFromPath, sortGalleryItemsByDate } from "@/lib/imageDates";
+import { useSaveShortcut } from "@/hooks/useSaveShortcut";
 import { Save, Trash2, ArrowUp, ArrowDown, Check } from "lucide-react";
 import type { AboutContent, LanguageCode } from "@/types/content";
 
@@ -59,6 +60,8 @@ export default function EditAboutPage() {
       setIsSaving(false);
     }
   };
+
+  useSaveShortcut(handleSave, { enabled: !isSaving });
 
   const addImage = (src: string) => {
     if (!content.images.some((img) => img.src === src)) {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { useSaveShortcut } from "@/hooks/useSaveShortcut";
 import { Save } from "lucide-react";
 
 type TranslationMap = Record<string, string>;
@@ -46,6 +47,8 @@ export default function EditTranslationsPage() {
       setIsSaving(false);
     }
   };
+
+  useSaveShortcut(handleSave, { enabled: !isSaving });
 
   const updateValue = (key: string, value: string) => {
     setTranslations((prev) => ({
