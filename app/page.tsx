@@ -95,7 +95,6 @@ function HomePage() {
     transport: t("rsvp.transport"),
     commentsLabel: t("rsvp.commentsLabel"),
     commentsPlaceholder: t("rsvp.comments"),
-    supportLink: t("rsvp.supportLink"),
     submit: t("rsvp.submit"),
     success: t("rsvp.success"),
     error: t("rsvp.error"),

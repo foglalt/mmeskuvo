@@ -32,7 +32,6 @@ interface RsvpFormProps {
     transport: string;
     commentsLabel: string;
     commentsPlaceholder: string;
-    supportLink: string;
     submit: string;
     success: string;
     error: string;
@@ -384,12 +383,6 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
           </div>
         </div>
       )}
-
-      <div className="text-sm text-gray-500">
-        <a href="#support" className="text-accent hover:underline">
-          {translations.supportLink}
-        </a>
-      </div>
 
       <Textarea
         label={translations.commentsLabel}

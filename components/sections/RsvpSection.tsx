@@ -17,7 +17,6 @@ interface RsvpSectionProps {
     transport: string;
     commentsLabel: string;
     commentsPlaceholder: string;
-    supportLink: string;
     submit: string;
     success: string;
     error: string;
