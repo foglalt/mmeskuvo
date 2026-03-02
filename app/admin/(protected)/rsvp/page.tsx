@@ -300,29 +300,29 @@ export default function RsvpListPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="bg-white rounded-lg border overflow-x-auto">
-          <table className="w-full table-fixed">
+        <div className="bg-white rounded-lg border overflow-hidden">
+          <table className="w-full table-auto">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="w-[24%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
                   Nevek
                 </th>
-                <th className="w-[12%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
                   Telefon
                 </th>
-                <th className="w-[20%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
                   Igények
                 </th>
-                <th className="w-[12%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
                   Vendég megjegyzés
                 </th>
-                <th className="w-[20%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
                   Admin megjegyzés
                 </th>
-                <th className="w-[8%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500 whitespace-nowrap">
                   Dátum
                 </th>
-                <th className="w-[4%] px-4 py-3"></th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y">
