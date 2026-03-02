@@ -3,8 +3,38 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, Button, Textarea } from "@/components/ui";
 import { Download, Trash2, Users, Car, Home, Heart } from "lucide-react";
-import { formatDateTime } from "@/lib/utils";
 import type { RsvpSubmission } from "@/types/content";
+
+const formatHungarianMonthDay = (date: Date | string) => {
+  const parsed = typeof date === "string" ? new Date(date) : date;
+  const parts = new Intl.DateTimeFormat("hu-HU", {
+    month: "long",
+    day: "numeric",
+  }).formatToParts(parsed);
+  const month = parts.find((part) => part.type === "month")?.value ?? "";
+  const day = parts.find((part) => part.type === "day")?.value ?? "";
+  return `${month} ${day}`.trim();
+};
+
+const getRequestSummary = (submission: RsvpSubmission) => {
+  const requested: string[] = [];
+  if (submission.needsAccommodation) {
+    requested.push(
+      submission.accommodationResolved ? "Szállás (megoldva)" : "Szállás"
+    );
+  }
+  if (submission.needsTransport) {
+    requested.push(
+      submission.transportResolved ? "Szállítás (megoldva)" : "Szállítás"
+    );
+  }
+  if (submission.volunteerOptions.length > 0) {
+    requested.push(
+      submission.volunteerResolved ? "Segítség (megoldva)" : "Segítség"
+    );
+  }
+  return requested.length > 0 ? requested.join("; ") : "-";
+};
 
 export default function RsvpListPage() {
   const [submissions, setSubmissions] = useState<RsvpSubmission[]>([]);
@@ -95,14 +125,14 @@ export default function RsvpListPage() {
     }
   };
 
-  const updateAdminComment = async (id: string) => {
+  const updateAdminComment = async (id: string, adminComment: string) => {
     setUpdatingKey(`${id}:adminComment`);
     try {
       const response = await fetch(`/api/rsvp/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          adminComment: adminCommentDrafts[id] ?? "",
+          adminComment,
         }),
       });
 
@@ -127,37 +157,32 @@ export default function RsvpListPage() {
     }
   };
 
+  const handleAdminCommentBlur = (submission: RsvpSubmission) => {
+    const draft = adminCommentDrafts[submission.id] ?? "";
+    const saved = submission.adminComment ?? "";
+    if (draft === saved) return;
+    void updateAdminComment(submission.id, draft);
+  };
+
   const escapeCsvValue = (value: string) => `"${value.replace(/\"/g, "\"\"")}"`;
 
   const exportToCSV = () => {
     const headers = [
-      "Név",
-      "További vendégek",
+      "Nevek",
       "Telefon",
-      "Szállás",
-      "Szállás megoldva",
-      "Szállítás",
-      "Szállítás megoldva",
-      "Segítség",
-      "Segítség megoldva",
-      "Admin megjegyzés",
+      "Igények",
       "Megjegyzés",
+      "Admin megjegyzés",
       "Dátum",
     ];
 
     const rows = submissions.map((s) => [
-      s.guestName,
-      s.additionalGuests.join("; "),
+      [s.guestName, ...s.additionalGuests].join("; "),
       s.phone || "",
-      s.needsAccommodation ? "Igen" : "Nem",
-      s.accommodationResolved ? "Igen" : "Nem",
-      s.needsTransport ? "Igen" : "Nem",
-      s.transportResolved ? "Igen" : "Nem",
-      s.volunteerOptions.length > 0 ? "Igen" : "Nem",
-      s.volunteerResolved ? "Igen" : "Nem",
-      s.adminComment || "",
+      getRequestSummary(s),
       s.comments || "",
-      formatDateTime(s.createdAt),
+      s.adminComment || "",
+      formatHungarianMonthDay(s.createdAt),
     ]);
 
     const csv = [headers, ...rows]
@@ -255,44 +280,46 @@ export default function RsvpListPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="bg-white rounded-lg border overflow-hidden">
-          <table className="w-full">
+        <div className="bg-white rounded-lg border overflow-x-auto">
+          <table className="w-full table-fixed">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
-                  Név
+                <th className="w-[24%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                  Nevek
                 </th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
-                  További vendégek
+                <th className="w-[12%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                  Telefon
                 </th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
+                <th className="w-[20%] text-left px-4 py-3 text-sm font-medium text-gray-500">
                   Igények
                 </th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">
+                <th className="w-[12%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                  Vendég megjegyzés
+                </th>
+                <th className="w-[20%] text-left px-4 py-3 text-sm font-medium text-gray-500">
+                  Admin megjegyzés
+                </th>
+                <th className="w-[8%] text-left px-4 py-3 text-sm font-medium text-gray-500">
                   Dátum
                 </th>
-                <th className="px-4 py-3"></th>
+                <th className="w-[4%] px-4 py-3"></th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {submissions.map((submission) => (
                 <tr key={submission.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
-                    <div className="font-medium">{submission.guestName}</div>
-                    {submission.phone && (
-                      <div className="text-sm text-gray-500">{submission.phone}</div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {submission.additionalGuests.length > 0 ? (
-                      <ul className="text-sm">
+                    <div className="font-medium text-gray-900">{submission.guestName}</div>
+                    {submission.additionalGuests.length > 0 && (
+                      <ul className="mt-1 space-y-0.5 text-sm text-gray-600">
                         {submission.additionalGuests.map((guest, index) => (
                           <li key={index}>{guest}</li>
                         ))}
                       </ul>
-                    ) : (
-                      <span className="text-gray-400">-</span>
                     )}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700 break-words">
+                    {submission.phone || <span className="text-gray-400">-</span>}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-2">
@@ -387,41 +414,36 @@ export default function RsvpListPage() {
                           />
                         </label>
                       )}
-                    </div>
-                    {submission.comments && (
-                      <div className="mt-1 text-xs text-gray-500 italic">
-                        &quot;{submission.comments}&quot;
-                      </div>
-                    )}
-                    <div className="mt-3 space-y-2">
-                      <Textarea
-                        value={adminCommentDrafts[submission.id] ?? ""}
-                        onChange={(event) =>
-                          setAdminCommentDrafts((current) => ({
-                            ...current,
-                            [submission.id]: event.target.value,
-                          }))
-                        }
-                        placeholder="Admin megjegyzés..."
-                        rows={2}
-                        className="min-h-0 text-xs py-1.5"
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={
-                          updatingKey === `${submission.id}:adminComment` ||
-                          (adminCommentDrafts[submission.id] ?? "") ===
-                            (submission.adminComment ?? "")
-                        }
-                        onClick={() => updateAdminComment(submission.id)}
-                      >
-                        Admin megjegyzés mentése
-                      </Button>
+                      {!submission.needsAccommodation &&
+                        !submission.needsTransport &&
+                        submission.volunteerOptions.length === 0 && (
+                          <span className="text-sm text-gray-400">-</span>
+                        )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {formatDateTime(submission.createdAt)}
+                  <td className="px-4 py-3 text-sm text-gray-700 break-words">
+                    {submission.comments?.trim() || (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Textarea
+                      value={adminCommentDrafts[submission.id] ?? ""}
+                      onChange={(event) =>
+                        setAdminCommentDrafts((current) => ({
+                          ...current,
+                          [submission.id]: event.target.value,
+                        }))
+                      }
+                      onBlur={() => handleAdminCommentBlur(submission)}
+                      placeholder="Admin megjegyzés..."
+                      rows={2}
+                      className="min-h-0 text-xs py-1.5"
+                      disabled={updatingKey === `${submission.id}:adminComment`}
+                    />
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                    {formatHungarianMonthDay(submission.createdAt)}
                   </td>
                   <td className="px-4 py-3">
                     <Button
