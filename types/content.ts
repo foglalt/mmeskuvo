@@ -74,6 +74,8 @@ export interface RsvpSubmission {
   phone?: string;
   needsAccommodation: boolean;
   needsTransport: boolean;
+  accommodationResolved: boolean;
+  transportResolved: boolean;
   volunteerOptions: string[];
   comments?: string;
   language: LanguageCode;

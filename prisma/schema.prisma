@@ -44,6 +44,8 @@ model RsvpSubmission {
   // Needs
   needsAccommodation Boolean @default(false)
   needsTransport     Boolean @default(false)
+  accommodationResolved Boolean @default(false)
+  transportResolved     Boolean @default(false)
   
   // Support options
   volunteerOptions String[] // Selected volunteer options

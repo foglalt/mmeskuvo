@@ -92,6 +92,20 @@ export const rsvpSubmissionSchema = z.object({
   language: z.enum(["hu", "en"]).default("hu"),
 });
 
+export const rsvpResolutionUpdateSchema = z
+  .object({
+    accommodationResolved: z.boolean().optional(),
+    transportResolved: z.boolean().optional(),
+  })
+  .refine(
+    (value) =>
+      value.accommodationResolved !== undefined ||
+      value.transportResolved !== undefined,
+    {
+      message: "At least one resolution field is required",
+    }
+  );
+
 // Translations
 export const translationsSchema = z.object({
   hu: z.record(z.string(), z.string()),
@@ -109,5 +123,6 @@ export type GalleryImage = z.infer<typeof galleryImageSchema>;
 export type AboutContent = z.infer<typeof aboutSchema>;
 export type SiteContentInput = z.infer<typeof siteContentSchema>;
 export type RsvpSubmissionInput = z.infer<typeof rsvpSubmissionSchema>;
+export type RsvpResolutionUpdateInput = z.infer<typeof rsvpResolutionUpdateSchema>;
 export type TranslationsInput = z.infer<typeof translationsSchema>;
 

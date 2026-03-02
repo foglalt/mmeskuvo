@@ -9,6 +9,7 @@ import type { RsvpSubmission } from "@/types/content";
 export default function RsvpListPage() {
   const [submissions, setSubmissions] = useState<RsvpSubmission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSubmissions();
@@ -45,6 +46,36 @@ export default function RsvpListPage() {
     }
   };
 
+  const updateResolution = async (
+    id: string,
+    field: "accommodationResolved" | "transportResolved",
+    value: boolean
+  ) => {
+    setUpdatingId(id);
+    try {
+      const response = await fetch(`/api/rsvp/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [field]: value }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update resolution status");
+      }
+
+      const updated = (await response.json()) as RsvpSubmission;
+      setSubmissions((current) =>
+        current.map((submission) =>
+          submission.id === id ? updated : submission
+        )
+      );
+    } catch (error) {
+      console.error("Failed to update resolution status:", error);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const escapeCsvValue = (value: string) => `"${value.replace(/\"/g, "\"\"")}"`;
 
   const exportToCSV = () => {
@@ -53,7 +84,9 @@ export default function RsvpListPage() {
       "További vendégek",
       "Telefon",
       "Szállás",
+      "Szállás megoldva",
       "Szállítás",
+      "Szállítás megoldva",
       "Segítség",
       "Megjegyzés",
       "Dátum",
@@ -64,7 +97,9 @@ export default function RsvpListPage() {
       s.additionalGuests.join("; "),
       s.phone || "",
       s.needsAccommodation ? "Igen" : "Nem",
+      s.accommodationResolved ? "Igen" : "Nem",
       s.needsTransport ? "Igen" : "Nem",
+      s.transportResolved ? "Igen" : "Nem",
       s.volunteerOptions.join("; "),
       s.comments || "",
       formatDateTime(s.createdAt),
@@ -86,8 +121,12 @@ export default function RsvpListPage() {
     (acc, s) => acc + 1 + s.additionalGuests.length,
     0
   );
-  const needsAccommodation = submissions.filter((s) => s.needsAccommodation).length;
-  const needsTransport = submissions.filter((s) => s.needsTransport).length;
+  const needsAccommodationPending = submissions.filter(
+    (s) => s.needsAccommodation && !s.accommodationResolved
+  ).length;
+  const needsTransportPending = submissions.filter(
+    (s) => s.needsTransport && !s.transportResolved
+  ).length;
 
   if (loading) {
     return <div className="p-8">Betöltés...</div>;
@@ -117,8 +156,8 @@ export default function RsvpListPage() {
           <CardContent className="flex items-center gap-3 py-4">
             <Home className="h-5 w-5 text-primary" />
             <div>
-              <p className="text-sm text-gray-500">Szállás kell</p>
-              <p className="text-xl font-semibold">{needsAccommodation}</p>
+              <p className="text-sm text-gray-500">Szállás függőben</p>
+              <p className="text-xl font-semibold">{needsAccommodationPending}</p>
             </div>
           </CardContent>
         </Card>
@@ -126,8 +165,8 @@ export default function RsvpListPage() {
           <CardContent className="flex items-center gap-3 py-4">
             <Car className="h-5 w-5 text-primary" />
             <div>
-              <p className="text-sm text-gray-500">Szállítás kell</p>
-              <p className="text-xl font-semibold">{needsTransport}</p>
+              <p className="text-sm text-gray-500">Szállítás függőben</p>
+              <p className="text-xl font-semibold">{needsTransportPending}</p>
             </div>
           </CardContent>
         </Card>
@@ -189,7 +228,7 @@ export default function RsvpListPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {submission.needsAccommodation && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
                           <Home className="h-3 w-3 mr-1" />
@@ -201,6 +240,52 @@ export default function RsvpListPage() {
                           <Car className="h-3 w-3 mr-1" />
                           Szállítás
                         </span>
+                      )}
+                    </div>
+                    <div className="mt-2 flex flex-col gap-2">
+                      {submission.needsAccommodation && (
+                        <Button
+                          variant={
+                            submission.accommodationResolved
+                              ? "secondary"
+                              : "outline"
+                          }
+                          size="sm"
+                          disabled={updatingId === submission.id}
+                          onClick={() =>
+                            updateResolution(
+                              submission.id,
+                              "accommodationResolved",
+                              !submission.accommodationResolved
+                            )
+                          }
+                          className="justify-start"
+                        >
+                          {submission.accommodationResolved
+                            ? "Szállás megoldva"
+                            : "Szállás nincs megoldva"}
+                        </Button>
+                      )}
+                      {submission.needsTransport && (
+                        <Button
+                          variant={
+                            submission.transportResolved ? "secondary" : "outline"
+                          }
+                          size="sm"
+                          disabled={updatingId === submission.id}
+                          onClick={() =>
+                            updateResolution(
+                              submission.id,
+                              "transportResolved",
+                              !submission.transportResolved
+                            )
+                          }
+                          className="justify-start"
+                        >
+                          {submission.transportResolved
+                            ? "Szállítás megoldva"
+                            : "Szállítás nincs megoldva"}
+                        </Button>
                       )}
                     </div>
                     {submission.volunteerOptions.length > 0 && (
