@@ -9,6 +9,8 @@ interface SupportSectionProps {
   title: string;
   moreInfoLabel?: string;
   language?: LanguageCode;
+  animate?: boolean;
+  fullscreen?: boolean;
 }
 
 export function SupportSection({
@@ -16,11 +18,18 @@ export function SupportSection({
   title,
   moreInfoLabel = "More info",
   language = "hu",
+  animate = true,
+  fullscreen = true,
 }: SupportSectionProps) {
   const localizedIntro = localizeText(content.intro, language);
 
   return (
-    <SectionWrapper id="support" className="bg-secondary/20">
+    <SectionWrapper
+      id="support"
+      className="bg-secondary/20"
+      animate={animate}
+      fullscreen={fullscreen}
+    >
       <div className="text-center mb-8">
         <h2 className="font-serif text-3xl md:text-4xl text-primary mb-4">
           {title}

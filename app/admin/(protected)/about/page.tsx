@@ -273,11 +273,13 @@ export default function EditAboutPage() {
 
       <div className="lg:sticky lg:top-8 lg:self-start">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Előnézet</h2>
-        <div className="border rounded-lg overflow-hidden bg-white max-h-[80vh] overflow-auto">
+        <div className="border rounded-lg bg-white h-[70vh] lg:h-[calc(100vh-12rem)] overflow-y-auto overscroll-contain">
           <AboutSection
             content={content}
             language={activeLanguage}
             title="Rólunk"
+            animate={false}
+            fullscreen={false}
           />
         </div>
       </div>

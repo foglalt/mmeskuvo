@@ -9,12 +9,16 @@ interface AboutSectionProps {
   content: AboutContent;
   title: string;
   language?: LanguageCode;
+  animate?: boolean;
+  fullscreen?: boolean;
 }
 
 export function AboutSection({
   content,
   title,
   language = "hu",
+  animate = true,
+  fullscreen = true,
 }: AboutSectionProps) {
   const localizedStory = localizeText(content.story, language);
   const localizedImages = sortGalleryItemsByDate(content.images).map((image) => ({
@@ -25,7 +29,12 @@ export function AboutSection({
   }));
 
   return (
-    <SectionWrapper id="about" className="bg-white">
+    <SectionWrapper
+      id="about"
+      className="bg-white"
+      animate={animate}
+      fullscreen={fullscreen}
+    >
       <div className="text-center mb-8">
         <h2 className="font-serif text-3xl md:text-4xl text-primary mb-4">
           {title}

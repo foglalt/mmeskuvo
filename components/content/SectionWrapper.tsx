@@ -8,6 +8,7 @@ interface SectionWrapperProps {
   children: React.ReactNode;
   className?: string;
   animate?: boolean;
+  fullscreen?: boolean;
 }
 
 export function SectionWrapper({
@@ -15,7 +16,13 @@ export function SectionWrapper({
   children,
   className,
   animate = true,
+  fullscreen = true,
 }: SectionWrapperProps) {
+  const sectionClasses = cn(
+    fullscreen ? "min-h-screen py-16 scroll-mt-16" : "min-h-0 py-8 scroll-mt-16",
+    className
+  );
+
   const content = (
     <div className="mx-auto max-w-4xl px-4 md:px-8">
       {children}
@@ -26,7 +33,7 @@ export function SectionWrapper({
     return (
       <section
         id={id}
-        className={cn("min-h-screen py-16 scroll-mt-16", className)}
+        className={sectionClasses}
       >
         {content}
       </section>
@@ -40,7 +47,7 @@ export function SectionWrapper({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={cn("min-h-screen py-16 scroll-mt-16", className)}
+      className={sectionClasses}
     >
       {content}
     </motion.section>
