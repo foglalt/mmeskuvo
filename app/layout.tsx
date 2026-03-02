@@ -60,6 +60,13 @@ const libreBaskerville = Libre_Baskerville({
 export const metadata: Metadata = {
   title: "M & M Esküvő",
   description: "Esküvői meghívó és információk",
+  icons: {
+    icon: [
+      { url: "/favicon-mnm.svg?v=6", type: "image/svg+xml" },
+      { url: "/favicon.ico?v=6", type: "image/x-icon", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico?v=6",
+  },
 };
 
 export default function RootLayout({
@@ -67,11 +74,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const fontVariableClasses = `${playfairDisplay.variable} ${cormorantGaramond.variable} ${greatVibes.variable} ${lora.variable} ${merriweather.variable} ${crimsonText.variable} ${libreBaskerville.variable}`;
+
   return (
-    <html lang="hu" className="scroll-smooth">
-      <body
-        className={`${playfairDisplay.variable} ${cormorantGaramond.variable} ${greatVibes.variable} ${lora.variable} ${merriweather.variable} ${crimsonText.variable} ${libreBaskerville.variable} antialiased`}
-      >
+    <html lang="hu" className={`${fontVariableClasses} scroll-smooth`}>
+      <body className="antialiased">
         {children}
       </body>
     </html>

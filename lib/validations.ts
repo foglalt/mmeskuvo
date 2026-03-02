@@ -2,6 +2,24 @@ import { z } from "zod";
 
 // Reusable schemas
 const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be valid hex color");
+const localizedTextSchema = z
+  .union([
+    z.string(),
+    z.object({
+      hu: z.string(),
+      en: z.string(),
+    }),
+  ])
+  .transform((value) => {
+    if (typeof value === "string") {
+      return { hu: value, en: value };
+    }
+
+    return {
+      hu: value.hu ?? value.en ?? "",
+      en: value.en ?? value.hu ?? "",
+    };
+  });
 
 // Theme configuration
 export const themeSchema = z.object({
@@ -20,36 +38,36 @@ export const heroSchema = z.object({
 
 // Info section
 export const infoSubsectionSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  content: z.string(),
+  title: localizedTextSchema,
+  content: localizedTextSchema,
 });
 
 export const infoSchema = z.object({
-  mainText: z.string(),
+  mainText: localizedTextSchema,
   subsections: z.array(infoSubsectionSchema),
 });
 
 // Support section
 export const supportOptionSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string(),
+  title: localizedTextSchema,
+  description: localizedTextSchema,
   link: z.string().url().optional().or(z.literal("")),
 });
 
 export const supportSchema = z.object({
-  intro: z.string(),
+  intro: localizedTextSchema,
   options: z.array(supportOptionSchema),
-  volunteerOptions: z.array(z.string()),
+  volunteerOptions: z.array(localizedTextSchema),
 });
 
 // About section
 export const galleryImageSchema = z.object({
   src: z.string().min(1, "Image source is required"),
-  caption: z.string().optional(),
+  caption: localizedTextSchema.optional(),
 });
 
 export const aboutSchema = z.object({
-  story: z.string(),
+  story: localizedTextSchema,
   images: z.array(galleryImageSchema),
 });
 
@@ -74,6 +92,26 @@ export const rsvpSubmissionSchema = z.object({
   language: z.enum(["hu", "en"]).default("hu"),
 });
 
+export const rsvpResolutionUpdateSchema = z
+  .object({
+    accommodationResolved: z.boolean().optional(),
+    transportResolved: z.boolean().optional(),
+    volunteerResolved: z.boolean().optional(),
+    volunteerTransportResolved: z.boolean().optional(),
+    adminComment: z.string().max(2000).optional(),
+  })
+  .refine(
+    (value) =>
+      value.accommodationResolved !== undefined ||
+      value.transportResolved !== undefined ||
+      value.volunteerResolved !== undefined ||
+      value.volunteerTransportResolved !== undefined ||
+      value.adminComment !== undefined,
+    {
+      message: "At least one update field is required",
+    }
+  );
+
 // Translations
 export const translationsSchema = z.object({
   hu: z.record(z.string(), z.string()),
@@ -91,5 +129,6 @@ export type GalleryImage = z.infer<typeof galleryImageSchema>;
 export type AboutContent = z.infer<typeof aboutSchema>;
 export type SiteContentInput = z.infer<typeof siteContentSchema>;
 export type RsvpSubmissionInput = z.infer<typeof rsvpSubmissionSchema>;
+export type RsvpResolutionUpdateInput = z.infer<typeof rsvpResolutionUpdateSchema>;
 export type TranslationsInput = z.infer<typeof translationsSchema>;
 

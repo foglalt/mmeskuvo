@@ -1,30 +1,44 @@
 import { SectionWrapper } from "@/components/content/SectionWrapper";
 import { MarkdownRenderer } from "@/components/content/MarkdownRenderer";
 import { Card, CardTitle, CardContent } from "@/components/ui/Card";
-import type { SupportContent } from "@/types/content";
+import { localizeText } from "@/lib/localizedContent";
+import type { LanguageCode, SupportContent } from "@/types/content";
 
 interface SupportSectionProps {
   content: SupportContent;
   title: string;
   moreInfoLabel?: string;
+  language?: LanguageCode;
+  animate?: boolean;
+  fullscreen?: boolean;
 }
 
 export function SupportSection({
   content,
   title,
   moreInfoLabel = "More info",
+  language = "hu",
+  animate = true,
+  fullscreen = true,
 }: SupportSectionProps) {
+  const localizedIntro = localizeText(content.intro, language);
+
   return (
-    <SectionWrapper id="support" className="bg-secondary/20">
+    <SectionWrapper
+      id="support"
+      className="bg-secondary/20"
+      animate={animate}
+      fullscreen={fullscreen}
+    >
       <div className="text-center mb-8">
         <h2 className="font-serif text-3xl md:text-4xl text-primary mb-4">
           {title}
         </h2>
       </div>
 
-      {content.intro && (
+      {localizedIntro && (
         <div className="mb-8">
-          <MarkdownRenderer content={content.intro} />
+          <MarkdownRenderer content={localizedIntro} />
         </div>
       )}
 
@@ -33,10 +47,12 @@ export function SupportSection({
           {content.options.map((option, index) => (
             <Card key={index} className="bg-white/80">
               <CardTitle className="font-serif text-xl text-primary">
-                {option.title}
+                {localizeText(option.title, language)}
               </CardTitle>
               <CardContent>
-                <MarkdownRenderer content={option.description} />
+                <MarkdownRenderer
+                  content={localizeText(option.description, language)}
+                />
                 {option.link && (
                   <a
                     href={option.link}

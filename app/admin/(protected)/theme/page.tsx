@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
+import { useSaveShortcut } from "@/hooks/useSaveShortcut";
 import { Save } from "lucide-react";
 import type { ThemeConfig } from "@/types/content";
 import { FONT_OPTIONS } from "@/lib/fonts";
@@ -32,11 +33,14 @@ export default function EditThemePage() {
     setIsSaving(true);
     setSaved(false);
     try {
-      await fetch("/api/content", {
+      const response = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ theme }),
       });
+      if (!response.ok) {
+        throw new Error("Failed to save theme");
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
@@ -45,6 +49,8 @@ export default function EditThemePage() {
       setIsSaving(false);
     }
   };
+
+  useSaveShortcut(handleSave, { enabled: !isSaving });
 
   return (
     <div className="max-w-2xl">

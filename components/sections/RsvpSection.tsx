@@ -2,10 +2,8 @@
 
 import { SectionWrapper } from "@/components/content/SectionWrapper";
 import { RsvpForm } from "@/components/forms/RsvpForm";
-import type { SupportContent } from "@/types/content";
 
 interface RsvpSectionProps {
-  volunteerOptions: SupportContent["volunteerOptions"];
   language: "hu" | "en";
   translations: {
     title: string;
@@ -16,18 +14,30 @@ interface RsvpSectionProps {
     phonePlaceholder: string;
     accommodation: string;
     transport: string;
-    volunteerTitle: string;
+    help: string;
+    helpTransport: string;
     commentsLabel: string;
     commentsPlaceholder: string;
-    supportLink: string;
     submit: string;
     success: string;
     error: string;
+    alreadySubmittedTitle: string;
+    alreadySubmittedDescription: string;
+    modify: string;
+    summaryName: string;
+    summaryAdditionalGuests: string;
+    summaryPhone: string;
+    summaryAccommodation: string;
+    summaryTransport: string;
+    summaryVolunteer: string;
+    summaryComments: string;
+    summaryYes: string;
+    summaryNo: string;
+    summaryNone: string;
   };
 }
 
 export function RsvpSection({
-  volunteerOptions,
   language,
   translations,
 }: RsvpSectionProps) {
@@ -41,7 +51,6 @@ export function RsvpSection({
       
       <div className="max-w-xl mx-auto">
         <RsvpForm
-          volunteerOptions={volunteerOptions}
           language={language}
           translations={translations}
         />

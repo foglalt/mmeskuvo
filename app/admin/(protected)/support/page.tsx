@@ -3,16 +3,18 @@
 import { useState, useEffect } from "react";
 import { Button, Textarea, Input, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
 import { SupportSection } from "@/components/sections/SupportSection";
+import { normalizeSupportContent } from "@/lib/localizedContent";
+import { useSaveShortcut } from "@/hooks/useSaveShortcut";
 import { Save, Plus, Trash2 } from "lucide-react";
-import type { SupportContent, SupportOption } from "@/types/content";
+import type { LanguageCode, SupportContent } from "@/types/content";
 
 export default function EditSupportPage() {
   const [content, setContent] = useState<SupportContent>({
-    intro: "",
+    intro: { hu: "", en: "" },
     options: [],
     volunteerOptions: [],
   });
-  const [newVolunteer, setNewVolunteer] = useState("");
+  const [activeLanguage, setActiveLanguage] = useState<LanguageCode>("hu");
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -21,7 +23,7 @@ export default function EditSupportPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data?.support) {
-          setContent(data.support);
+          setContent(normalizeSupportContent(data.support));
         }
       })
       .catch(console.error);
@@ -31,11 +33,14 @@ export default function EditSupportPage() {
     setIsSaving(true);
     setSaved(false);
     try {
-      await fetch("/api/content", {
+      const response = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ support: content }),
       });
+      if (!response.ok) {
+        throw new Error("Failed to save support content");
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
@@ -45,16 +50,42 @@ export default function EditSupportPage() {
     }
   };
 
+  useSaveShortcut(handleSave, { enabled: !isSaving });
+
   const addOption = () => {
     setContent({
       ...content,
-      options: [...content.options, { title: "", description: "", link: "" }],
+      options: [
+        ...content.options,
+        {
+          title: { hu: "", en: "" },
+          description: { hu: "", en: "" },
+          link: "",
+        },
+      ],
     });
   };
 
-  const updateOption = (index: number, updates: Partial<SupportOption>) => {
+  const updateOptionText = (
+    index: number,
+    field: "title" | "description",
+    value: string
+  ) => {
     const updated = [...content.options];
-    updated[index] = { ...updated[index], ...updates };
+    const option = updated[index];
+    updated[index] = {
+      ...option,
+      [field]: {
+        ...option[field],
+        [activeLanguage]: value,
+      },
+    };
+    setContent({ ...content, options: updated });
+  };
+
+  const updateOptionLink = (index: number, link: string) => {
+    const updated = [...content.options];
+    updated[index] = { ...updated[index], link };
     setContent({ ...content, options: updated });
   };
 
@@ -65,42 +96,59 @@ export default function EditSupportPage() {
     });
   };
 
-  const addVolunteerOption = () => {
-    if (newVolunteer.trim()) {
-      setContent({
-        ...content,
-        volunteerOptions: [...content.volunteerOptions, newVolunteer.trim()],
-      });
-      setNewVolunteer("");
-    }
-  };
-
-  const removeVolunteerOption = (index: number) => {
-    setContent({
-      ...content,
-      volunteerOptions: content.volunteerOptions.filter((_, i) => i !== index),
-    });
-  };
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-serif text-gray-900">Támogatás</h1>
-          <Button onClick={handleSave} isLoading={isSaving}>
-            <Save className="h-4 w-4 mr-2" />
-            {saved ? "Mentve!" : "Mentés"}
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="flex rounded-lg border overflow-hidden">
+              <button
+                onClick={() => setActiveLanguage("hu")}
+                className={`px-4 py-2 text-sm font-medium ${
+                  activeLanguage === "hu"
+                    ? "bg-primary text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                Magyar
+              </button>
+              <button
+                onClick={() => setActiveLanguage("en")}
+                className={`px-4 py-2 text-sm font-medium ${
+                  activeLanguage === "en"
+                    ? "bg-primary text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                English
+              </button>
+            </div>
+            <Button onClick={handleSave} isLoading={isSaving}>
+              <Save className="h-4 w-4 mr-2" />
+              {saved ? "Mentve!" : "Mentés"}
+            </Button>
+          </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Bevezető szöveg</CardTitle>
+            <CardTitle>
+              Bevezető szöveg ({activeLanguage === "hu" ? "Magyar" : "English"})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea
-              value={content.intro}
-              onChange={(e) => setContent({ ...content, intro: e.target.value })}
+              value={content.intro[activeLanguage]}
+              onChange={(e) =>
+                setContent({
+                  ...content,
+                  intro: {
+                    ...content.intro,
+                    [activeLanguage]: e.target.value,
+                  },
+                })
+              }
               rows={4}
               placeholder="Hálásak vagyunk jelenlétedért..."
             />
@@ -122,8 +170,10 @@ export default function EditSupportPage() {
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between">
                 <Input
-                  value={option.title}
-                  onChange={(e) => updateOption(index, { title: e.target.value })}
+                  value={option.title[activeLanguage]}
+                  onChange={(e) =>
+                    updateOptionText(index, "title", e.target.value)
+                  }
                   placeholder="Opció címe"
                   className="flex-1"
                 />
@@ -138,14 +188,16 @@ export default function EditSupportPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Textarea
-                  value={option.description}
-                  onChange={(e) => updateOption(index, { description: e.target.value })}
+                  value={option.description[activeLanguage]}
+                  onChange={(e) =>
+                    updateOptionText(index, "description", e.target.value)
+                  }
                   rows={3}
                   placeholder="Leírás (markdown)..."
                 />
                 <Input
                   value={option.link || ""}
-                  onChange={(e) => updateOption(index, { link: e.target.value })}
+                  onChange={(e) => updateOptionLink(index, e.target.value)}
                   placeholder="Link (opcionális): https://..."
                 />
               </CardContent>
@@ -153,55 +205,18 @@ export default function EditSupportPage() {
           ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Segítség opciók (checkboxok az RSVP-ben)</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex gap-2">
-              <Input
-                value={newVolunteer}
-                onChange={(e) => setNewVolunteer(e.target.value)}
-                placeholder="Pl: ételkészítés, dekoráció..."
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addVolunteerOption();
-                  }
-                }}
-              />
-              <Button variant="outline" onClick={addVolunteerOption}>
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {content.volunteerOptions.map((opt, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 rounded-full text-sm"
-                >
-                  {opt}
-                  <button
-                    onClick={() => removeVolunteerOption(index)}
-                    className="text-gray-400 hover:text-red-500"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="lg:sticky lg:top-8 lg:self-start">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Előnézet</h2>
-        <div className="border rounded-lg overflow-hidden bg-secondary/20 max-h-[80vh] overflow-auto">
+        <div className="border rounded-lg bg-secondary/20 h-[70vh] lg:h-[calc(100vh-12rem)] overflow-y-auto overscroll-contain">
           <SupportSection
             content={content}
+            language={activeLanguage}
             title="Szeretnélek támogatni"
             moreInfoLabel="További információ"
+            animate={false}
+            fullscreen={false}
           />
         </div>
       </div>

@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
-import { logout } from "@/lib/auth";
 
 export async function POST() {
   try {
-    await logout();
-    return NextResponse.json({ success: true });
+    const response = NextResponse.json({ success: true });
+    response.cookies.set("wedding_admin_auth", "", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 0,
+    });
+    return response;
   } catch (error) {
     console.error("Logout error:", error);
     return NextResponse.json(

@@ -5,10 +5,14 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { GalleryImage } from "@/types/content";
+
+interface ImageGalleryItem {
+  src: string;
+  caption?: string;
+}
 
 interface ImageGalleryProps {
-  images: GalleryImage[];
+  images: ImageGalleryItem[];
   className?: string;
 }
 

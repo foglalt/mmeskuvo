@@ -1,12 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, X, Check } from "lucide-react";
+import { Plus, X, Check, Sparkles, Pencil } from "lucide-react";
 import { Button, Input, Textarea, Checkbox } from "@/components/ui";
 
-interface RsvpFormProps {
+const RSVP_STORAGE_KEY = "wedding-rsvp-submission";
+const HELP_TRANSPORT_TOKEN = "__help_transport__";
+
+interface StoredRsvpSubmission {
+  id: string;
+  guestName: string;
+  additionalGuests: string[];
+  phone?: string;
+  needsAccommodation: boolean;
+  needsTransport: boolean;
   volunteerOptions: string[];
+  comments?: string;
+  language: "hu" | "en";
+}
+
+interface RsvpFormProps {
   language: "hu" | "en";
   translations: {
     nameLabel: string;
@@ -16,27 +30,106 @@ interface RsvpFormProps {
     phonePlaceholder: string;
     accommodation: string;
     transport: string;
-    volunteerTitle: string;
+    help: string;
+    helpTransport: string;
     commentsLabel: string;
     commentsPlaceholder: string;
-    supportLink: string;
     submit: string;
     success: string;
     error: string;
+    alreadySubmittedTitle: string;
+    alreadySubmittedDescription: string;
+    modify: string;
+    summaryName: string;
+    summaryAdditionalGuests: string;
+    summaryPhone: string;
+    summaryAccommodation: string;
+    summaryTransport: string;
+    summaryVolunteer: string;
+    summaryComments: string;
+    summaryYes: string;
+    summaryNo: string;
+    summaryNone: string;
   };
 }
 
-export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormProps) {
+const isStoredRsvpSubmission = (
+  value: unknown
+): value is StoredRsvpSubmission => {
+  if (typeof value !== "object" || value === null) return false;
+
+  const candidate = value as Partial<StoredRsvpSubmission>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.guestName === "string" &&
+    Array.isArray(candidate.additionalGuests) &&
+    typeof candidate.needsAccommodation === "boolean" &&
+    typeof candidate.needsTransport === "boolean" &&
+    Array.isArray(candidate.volunteerOptions) &&
+    (candidate.language === "hu" || candidate.language === "en")
+  );
+};
+
+export function RsvpForm({ language, translations }: RsvpFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [storedSubmission, setStoredSubmission] = useState<StoredRsvpSubmission | null>(null);
+  const [isEditingStoredSubmission, setIsEditingStoredSubmission] = useState(false);
 
   const [guestName, setGuestName] = useState("");
   const [additionalGuests, setAdditionalGuests] = useState<string[]>([]);
   const [phone, setPhone] = useState("");
   const [needsAccommodation, setNeedsAccommodation] = useState(false);
   const [needsTransport, setNeedsTransport] = useState(false);
-  const [selectedVolunteer, setSelectedVolunteer] = useState<string[]>([]);
+  const [needsHelp, setNeedsHelp] = useState(false);
+  const [canHelpWithTransport, setCanHelpWithTransport] = useState(false);
   const [comments, setComments] = useState("");
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(RSVP_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (isStoredRsvpSubmission(parsed)) {
+        setStoredSubmission(parsed);
+      }
+    } catch {
+      window.localStorage.removeItem(RSVP_STORAGE_KEY);
+    }
+  }, []);
+
+  const populateFormFromStoredSubmission = (submission: StoredRsvpSubmission) => {
+    const volunteerOptions = submission.volunteerOptions.map((option) =>
+      option.toLowerCase()
+    );
+    const hasTransportHelp = volunteerOptions.some(
+      (option) =>
+        option === HELP_TRANSPORT_TOKEN ||
+        option.includes("transport") ||
+        option.includes("szállítás")
+    );
+    const hasAnyHelp = volunteerOptions.length > 0;
+    const hasFoodHelp = volunteerOptions.some(
+      (option) =>
+        option !== HELP_TRANSPORT_TOKEN &&
+        !option.includes("transport") &&
+        !option.includes("szállítás")
+    );
+
+    setGuestName(submission.guestName);
+    setAdditionalGuests(submission.additionalGuests);
+    setPhone(submission.phone ?? "");
+    setNeedsAccommodation(submission.needsAccommodation);
+    setNeedsTransport(submission.needsTransport);
+    setNeedsHelp(hasAnyHelp && (hasFoodHelp || !hasTransportHelp));
+    setCanHelpWithTransport(hasTransportHelp);
+    setComments(submission.comments ?? "");
+  };
+
+  const saveSubmissionLocally = (submission: StoredRsvpSubmission) => {
+    setStoredSubmission(submission);
+    window.localStorage.setItem(RSVP_STORAGE_KEY, JSON.stringify(submission));
+  };
 
   const addGuest = () => {
     setAdditionalGuests([...additionalGuests, ""]);
@@ -50,14 +143,6 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
     const updated = [...additionalGuests];
     updated[index] = value;
     setAdditionalGuests(updated);
-  };
-
-  const toggleVolunteer = (option: string) => {
-    if (selectedVolunteer.includes(option)) {
-      setSelectedVolunteer(selectedVolunteer.filter((v) => v !== option));
-    } else {
-      setSelectedVolunteer([...selectedVolunteer, option]);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,7 +168,10 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
       additionalGuests: additionalGuests.filter((g) => g.trim() !== ""),
       needsAccommodation,
       needsTransport,
-      volunteerOptions: selectedVolunteer,
+      volunteerOptions: [
+        ...(needsHelp ? [translations.help] : []),
+        ...(canHelpWithTransport ? [HELP_TRANSPORT_TOKEN] : []),
+      ],
       language,
     };
 
@@ -95,30 +183,152 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
     }
 
     try {
+      const requestBody = storedSubmission?.id
+        ? { id: storedSubmission.id, ...payload }
+        : payload;
       const response = await fetch("/api/rsvp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
         throw new Error("Failed to submit RSVP");
       }
 
+      const responseData = await response.json();
+      const savedSubmission: StoredRsvpSubmission = {
+        id:
+          typeof responseData?.id === "string"
+            ? responseData.id
+            : storedSubmission?.id ?? "",
+        guestName: payload.guestName,
+        additionalGuests: payload.additionalGuests,
+        phone: payload.phone,
+        needsAccommodation: payload.needsAccommodation,
+        needsTransport: payload.needsTransport,
+        volunteerOptions: payload.volunteerOptions,
+        comments: payload.comments,
+        language: payload.language,
+      };
+
+      saveSubmissionLocally(savedSubmission);
       setSubmitStatus("success");
-      setGuestName("");
-      setAdditionalGuests([]);
-      setPhone("");
-      setNeedsAccommodation(false);
-      setNeedsTransport(false);
-      setSelectedVolunteer([]);
-      setComments("");
+      setIsEditingStoredSubmission(false);
     } catch {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleModify = () => {
+    if (!storedSubmission) return;
+    populateFormFromStoredSubmission(storedSubmission);
+    setIsEditingStoredSubmission(true);
+    setSubmitStatus("idle");
+  };
+
+  const showForm = !storedSubmission || isEditingStoredSubmission;
+  const summaryAdditionalGuests =
+    storedSubmission && storedSubmission.additionalGuests.length > 0
+      ? storedSubmission.additionalGuests.join(", ")
+      : translations.summaryNone;
+  const summaryVolunteerOptions =
+    storedSubmission && storedSubmission.volunteerOptions.length > 0
+      ? [
+          storedSubmission.volunteerOptions.some(
+            (option) => option !== HELP_TRANSPORT_TOKEN
+          )
+            ? translations.help
+            : null,
+          storedSubmission.volunteerOptions.some(
+            (option) =>
+              option === HELP_TRANSPORT_TOKEN ||
+              option.toLowerCase().includes("transport") ||
+              option.toLowerCase().includes("szállítás")
+          )
+            ? translations.helpTransport
+            : null,
+        ]
+          .filter((option): option is string => Boolean(option))
+          .join(", ")
+      : translations.summaryNo;
+
+  if (!showForm && storedSubmission) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-2xl border border-primary/30 bg-gradient-to-br from-emerald-50 via-white to-secondary/60 p-6 shadow-sm"
+      >
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-primary">
+              <Sparkles className="h-5 w-5" />
+              {translations.alreadySubmittedTitle}
+            </h3>
+            <p className="mt-1 text-sm text-gray-600">
+              {translations.alreadySubmittedDescription}
+            </p>
+          </div>
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">
+            {translations.success}
+          </span>
+        </div>
+
+        <div className="grid gap-3 text-sm md:grid-cols-2">
+          <div>
+            <p className="text-gray-500">{translations.summaryName}</p>
+            <p className="font-medium text-gray-900">{storedSubmission.guestName}</p>
+          </div>
+          <div>
+            <p className="text-gray-500">{translations.summaryPhone}</p>
+            <p className="font-medium text-gray-900">
+              {storedSubmission.phone?.trim() || translations.summaryNone}
+            </p>
+          </div>
+          <div className="md:col-span-2">
+            <p className="text-gray-500">{translations.summaryAdditionalGuests}</p>
+            <p className="font-medium text-gray-900">{summaryAdditionalGuests}</p>
+          </div>
+          <div>
+            <p className="text-gray-500">{translations.summaryAccommodation}</p>
+            <p className="font-medium text-gray-900">
+              {storedSubmission.needsAccommodation
+                ? translations.summaryYes
+                : translations.summaryNo}
+            </p>
+          </div>
+          <div>
+            <p className="text-gray-500">{translations.summaryTransport}</p>
+            <p className="font-medium text-gray-900">
+              {storedSubmission.needsTransport
+                ? translations.summaryYes
+                : translations.summaryNo}
+            </p>
+          </div>
+          <div className="md:col-span-2">
+            <p className="text-gray-500">{translations.summaryVolunteer}</p>
+            <p className="font-medium text-gray-900">{summaryVolunteerOptions}</p>
+          </div>
+          <div className="md:col-span-2">
+            <p className="text-gray-500">{translations.summaryComments}</p>
+            <p className="font-medium text-gray-900">
+              {storedSubmission.comments?.trim() || translations.summaryNone}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <Button type="button" variant="outline" onClick={handleModify}>
+            <Pencil className="mr-2 h-4 w-4" />
+            {translations.modify}
+          </Button>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -189,30 +399,16 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
           checked={needsTransport}
           onChange={(e) => setNeedsTransport(e.target.checked)}
         />
-      </div>
-
-      {volunteerOptions.length > 0 && (
-        <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-700">
-            {translations.volunteerTitle}
-          </label>
-          <div className="space-y-2">
-            {volunteerOptions.map((option) => (
-              <Checkbox
-                key={option}
-                label={option}
-                checked={selectedVolunteer.includes(option)}
-                onChange={() => toggleVolunteer(option)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="text-sm text-gray-500">
-        <a href="#support" className="text-accent hover:underline">
-          {translations.supportLink}
-        </a>
+        <Checkbox
+          label={translations.help}
+          checked={needsHelp}
+          onChange={(e) => setNeedsHelp(e.target.checked)}
+        />
+        <Checkbox
+          label={translations.helpTransport}
+          checked={canHelpWithTransport}
+          onChange={(e) => setCanHelpWithTransport(e.target.checked)}
+        />
       </div>
 
       <Textarea

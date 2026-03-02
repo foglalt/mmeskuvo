@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { readdir } from "fs/promises";
 import { join } from "path";
+import { sortImagePathsByDate } from "@/lib/imageDates";
 
 // GET - List available images in /public/images
 export async function GET() {
@@ -14,6 +15,7 @@ export async function GET() {
         .filter((entry) => entry.isFile())
         .filter((entry) => /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(entry.name))
         .map((entry) => `/images/${entry.name}`);
+      files = sortImagePathsByDate(files);
     } catch {
       // Directory doesn't exist or is empty
       files = [];

@@ -44,10 +44,15 @@ model RsvpSubmission {
   // Needs
   needsAccommodation Boolean @default(false)
   needsTransport     Boolean @default(false)
+  accommodationResolved Boolean @default(false)
+  transportResolved     Boolean @default(false)
+  volunteerResolved     Boolean @default(false)
+  volunteerTransportResolved Boolean @default(false)
   
   // Support options
   volunteerOptions String[] // Selected volunteer options
   comments         String?  // Additional comments
+  adminComment     String?  // Admin-only comment
   
   // Metadata
   language  String   @default("hu") // Language used when submitting
