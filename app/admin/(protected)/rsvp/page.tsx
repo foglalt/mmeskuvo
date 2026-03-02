@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, Button } from "@/components/ui";
-import { Download, Trash2, Users, Car, Home } from "lucide-react";
+import { Card, CardContent, Button, Textarea } from "@/components/ui";
+import { Download, Trash2, Users, Car, Home, Heart } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
 import type { RsvpSubmission } from "@/types/content";
 
@@ -10,6 +10,9 @@ export default function RsvpListPage() {
   const [submissions, setSubmissions] = useState<RsvpSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingKey, setUpdatingKey] = useState<string | null>(null);
+  const [adminCommentDrafts, setAdminCommentDrafts] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     fetchSubmissions();
@@ -23,7 +26,16 @@ export default function RsvpListPage() {
       }
       const data = await res.json();
       if (Array.isArray(data)) {
-        setSubmissions(data);
+        const loadedSubmissions = data as RsvpSubmission[];
+        setSubmissions(loadedSubmissions);
+        setAdminCommentDrafts(
+          Object.fromEntries(
+            loadedSubmissions.map((submission) => [
+              submission.id,
+              submission.adminComment ?? "",
+            ])
+          )
+        );
       }
     } catch (error) {
       console.error("Failed to fetch RSVPs:", error);
@@ -48,7 +60,10 @@ export default function RsvpListPage() {
 
   const updateResolution = async (
     id: string,
-    field: "accommodationResolved" | "transportResolved",
+    field:
+      | "accommodationResolved"
+      | "transportResolved"
+      | "volunteerResolved",
     value: boolean
   ) => {
     setUpdatingKey(`${id}:${field}`);
@@ -69,8 +84,44 @@ export default function RsvpListPage() {
           submission.id === id ? updated : submission
         )
       );
+      setAdminCommentDrafts((current) => ({
+        ...current,
+        [id]: updated.adminComment ?? "",
+      }));
     } catch (error) {
       console.error("Failed to update resolution status:", error);
+    } finally {
+      setUpdatingKey(null);
+    }
+  };
+
+  const updateAdminComment = async (id: string) => {
+    setUpdatingKey(`${id}:adminComment`);
+    try {
+      const response = await fetch(`/api/rsvp/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          adminComment: adminCommentDrafts[id] ?? "",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update admin comment");
+      }
+
+      const updated = (await response.json()) as RsvpSubmission;
+      setSubmissions((current) =>
+        current.map((submission) =>
+          submission.id === id ? updated : submission
+        )
+      );
+      setAdminCommentDrafts((current) => ({
+        ...current,
+        [id]: updated.adminComment ?? "",
+      }));
+    } catch (error) {
+      console.error("Failed to update admin comment:", error);
     } finally {
       setUpdatingKey(null);
     }
@@ -88,6 +139,8 @@ export default function RsvpListPage() {
       "Szállítás",
       "Szállítás megoldva",
       "Segítség",
+      "Segítség megoldva",
+      "Admin megjegyzés",
       "Megjegyzés",
       "Dátum",
     ];
@@ -101,6 +154,8 @@ export default function RsvpListPage() {
       s.needsTransport ? "Igen" : "Nem",
       s.transportResolved ? "Igen" : "Nem",
       s.volunteerOptions.join("; "),
+      s.volunteerResolved ? "Igen" : "Nem",
+      s.adminComment || "",
       s.comments || "",
       formatDateTime(s.createdAt),
     ]);
@@ -127,6 +182,9 @@ export default function RsvpListPage() {
   const needsTransportPending = submissions.filter(
     (s) => s.needsTransport && !s.transportResolved
   ).length;
+  const needsVolunteerPending = submissions.filter(
+    (s) => s.volunteerOptions.length > 0 && !s.volunteerResolved
+  ).length;
 
   if (loading) {
     return <div className="p-8">Betöltés...</div>;
@@ -142,7 +200,7 @@ export default function RsvpListPage() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         <Card>
           <CardContent className="flex items-center gap-3 py-4">
             <Users className="h-5 w-5 text-primary" />
@@ -176,6 +234,15 @@ export default function RsvpListPage() {
             <div>
               <p className="text-sm text-gray-500">Visszajelzések</p>
               <p className="text-xl font-semibold">{submissions.length}</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="flex items-center gap-3 py-4">
+            <Heart className="h-5 w-5 text-primary" />
+            <div>
+              <p className="text-sm text-gray-500">Segítség függőben</p>
+              <p className="text-xl font-semibold">{needsVolunteerPending}</p>
             </div>
           </CardContent>
         </Card>
@@ -290,6 +357,36 @@ export default function RsvpListPage() {
                           />
                         </label>
                       )}
+                      {submission.volunteerOptions.length > 0 && (
+                        <label className="inline-flex items-center gap-2 text-sm">
+                          <span
+                            className={
+                              submission.volunteerResolved
+                                ? "inline-flex items-center px-2 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700"
+                                : "inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700"
+                            }
+                          >
+                            <Heart className="h-3 w-3 mr-1" />
+                            Segítség
+                          </span>
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed"
+                            checked={submission.volunteerResolved}
+                            disabled={
+                              updatingKey === `${submission.id}:volunteerResolved`
+                            }
+                            onChange={(event) =>
+                              updateResolution(
+                                submission.id,
+                                "volunteerResolved",
+                                event.currentTarget.checked
+                              )
+                            }
+                            aria-label="Segítség megoldva"
+                          />
+                        </label>
+                      )}
                     </div>
                     {submission.volunteerOptions.length > 0 && (
                       <div className="mt-1 text-xs text-gray-500">
@@ -301,6 +398,32 @@ export default function RsvpListPage() {
                         &quot;{submission.comments}&quot;
                       </div>
                     )}
+                    <div className="mt-3 space-y-2">
+                      <Textarea
+                        value={adminCommentDrafts[submission.id] ?? ""}
+                        onChange={(event) =>
+                          setAdminCommentDrafts((current) => ({
+                            ...current,
+                            [submission.id]: event.target.value,
+                          }))
+                        }
+                        placeholder="Admin megjegyzés..."
+                        rows={2}
+                        className="min-h-0 text-xs py-1.5"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={
+                          updatingKey === `${submission.id}:adminComment` ||
+                          (adminCommentDrafts[submission.id] ?? "") ===
+                            (submission.adminComment ?? "")
+                        }
+                        onClick={() => updateAdminComment(submission.id)}
+                      >
+                        Admin megjegyzés mentése
+                      </Button>
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
                     {formatDateTime(submission.createdAt)}

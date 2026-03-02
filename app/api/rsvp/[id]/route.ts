@@ -59,9 +59,9 @@ export async function PATCH(
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error("Failed to update RSVP resolution:", error);
+    console.error("Failed to update RSVP:", error);
     return NextResponse.json(
-      { error: "Failed to update RSVP resolution" },
+      { error: "Failed to update RSVP" },
       { status: 500 }
     );
   }

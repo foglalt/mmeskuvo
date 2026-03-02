@@ -45,6 +45,8 @@ describe("PATCH /api/rsvp/[id]", () => {
       id: "rsvp_2",
       accommodationResolved: true,
       transportResolved: false,
+      volunteerResolved: false,
+      adminComment: null,
     });
 
     mockedIsAuthenticated.mockResolvedValue(true);
@@ -70,6 +72,46 @@ describe("PATCH /api/rsvp/[id]", () => {
       data: { accommodationResolved: true },
     });
     expect(data.accommodationResolved).toBe(true);
+  });
+
+  it("updates admin comment when authenticated", async () => {
+    const updateMock = vi.fn().mockResolvedValue({
+      id: "rsvp_4",
+      accommodationResolved: false,
+      transportResolved: false,
+      volunteerResolved: true,
+      adminComment: "Need callback on Tuesday",
+    });
+
+    mockedIsAuthenticated.mockResolvedValue(true);
+    mockedGetPrisma.mockReturnValue({
+      rsvpSubmission: {
+        update: updateMock,
+      },
+    } as unknown as ReturnType<typeof getPrisma>);
+
+    const response = await PATCH(
+      new Request("http://localhost/api/rsvp/rsvp_4", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          volunteerResolved: true,
+          adminComment: "Need callback on Tuesday",
+        }),
+      }) as Parameters<typeof PATCH>[0],
+      { params: Promise.resolve({ id: "rsvp_4" }) }
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(updateMock).toHaveBeenCalledWith({
+      where: { id: "rsvp_4" },
+      data: {
+        volunteerResolved: true,
+        adminComment: "Need callback on Tuesday",
+      },
+    });
+    expect(data.adminComment).toBe("Need callback on Tuesday");
   });
 
   it("returns 400 for empty payload", async () => {

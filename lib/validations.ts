@@ -96,13 +96,17 @@ export const rsvpResolutionUpdateSchema = z
   .object({
     accommodationResolved: z.boolean().optional(),
     transportResolved: z.boolean().optional(),
+    volunteerResolved: z.boolean().optional(),
+    adminComment: z.string().max(2000).optional(),
   })
   .refine(
     (value) =>
       value.accommodationResolved !== undefined ||
-      value.transportResolved !== undefined,
+      value.transportResolved !== undefined ||
+      value.volunteerResolved !== undefined ||
+      value.adminComment !== undefined,
     {
-      message: "At least one resolution field is required",
+      message: "At least one update field is required",
     }
   );
 
