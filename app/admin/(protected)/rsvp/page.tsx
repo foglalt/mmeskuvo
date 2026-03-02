@@ -9,7 +9,7 @@ import type { RsvpSubmission } from "@/types/content";
 export default function RsvpListPage() {
   const [submissions, setSubmissions] = useState<RsvpSubmission[]>([]);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [updatingKey, setUpdatingKey] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSubmissions();
@@ -51,7 +51,7 @@ export default function RsvpListPage() {
     field: "accommodationResolved" | "transportResolved",
     value: boolean
   ) => {
-    setUpdatingId(id);
+    setUpdatingKey(`${id}:${field}`);
     try {
       const response = await fetch(`/api/rsvp/${id}`, {
         method: "PATCH",
@@ -72,7 +72,7 @@ export default function RsvpListPage() {
     } catch (error) {
       console.error("Failed to update resolution status:", error);
     } finally {
-      setUpdatingId(null);
+      setUpdatingKey(null);
     }
   };
 
@@ -244,48 +244,69 @@ export default function RsvpListPage() {
                     </div>
                     <div className="mt-2 flex flex-col gap-2">
                       {submission.needsAccommodation && (
-                        <Button
-                          variant={
-                            submission.accommodationResolved
-                              ? "secondary"
-                              : "outline"
-                          }
-                          size="sm"
-                          disabled={updatingId === submission.id}
-                          onClick={() =>
-                            updateResolution(
-                              submission.id,
-                              "accommodationResolved",
-                              !submission.accommodationResolved
-                            )
-                          }
-                          className="justify-start"
-                        >
-                          {submission.accommodationResolved
-                            ? "Szállás megoldva"
-                            : "Szállás nincs megoldva"}
-                        </Button>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={
+                              submission.accommodationResolved
+                                ? "inline-flex items-center px-2 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700"
+                                : "inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700"
+                            }
+                          >
+                            {submission.accommodationResolved
+                              ? "Szállás megoldva"
+                              : "Szállás függőben"}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={
+                              submission.accommodationResolved ||
+                              updatingKey ===
+                                `${submission.id}:accommodationResolved`
+                            }
+                            onClick={() =>
+                              updateResolution(
+                                submission.id,
+                                "accommodationResolved",
+                                true
+                              )
+                            }
+                          >
+                            Szállás megoldása
+                          </Button>
+                        </div>
                       )}
                       {submission.needsTransport && (
-                        <Button
-                          variant={
-                            submission.transportResolved ? "secondary" : "outline"
-                          }
-                          size="sm"
-                          disabled={updatingId === submission.id}
-                          onClick={() =>
-                            updateResolution(
-                              submission.id,
-                              "transportResolved",
-                              !submission.transportResolved
-                            )
-                          }
-                          className="justify-start"
-                        >
-                          {submission.transportResolved
-                            ? "Szállítás megoldva"
-                            : "Szállítás nincs megoldva"}
-                        </Button>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className={
+                              submission.transportResolved
+                                ? "inline-flex items-center px-2 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700"
+                                : "inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700"
+                            }
+                          >
+                            {submission.transportResolved
+                              ? "Szállítás megoldva"
+                              : "Szállítás függőben"}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={
+                              submission.transportResolved ||
+                              updatingKey === `${submission.id}:transportResolved`
+                            }
+                            onClick={() =>
+                              updateResolution(
+                                submission.id,
+                                "transportResolved",
+                                true
+                              )
+                            }
+                          >
+                            Szállítás megoldása
+                          </Button>
+                        </div>
                       )}
                     </div>
                     {submission.volunteerOptions.length > 0 && (
