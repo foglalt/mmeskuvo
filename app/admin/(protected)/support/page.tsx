@@ -15,7 +15,6 @@ export default function EditSupportPage() {
     volunteerOptions: [],
   });
   const [activeLanguage, setActiveLanguage] = useState<LanguageCode>("hu");
-  const [newVolunteer, setNewVolunteer] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -95,19 +94,6 @@ export default function EditSupportPage() {
       ...content,
       options: content.options.filter((_, i) => i !== index),
     });
-  };
-
-  const addVolunteerOption = () => {
-    if (newVolunteer.trim()) {
-      setContent({
-        ...content,
-        volunteerOptions: [
-          ...content.volunteerOptions,
-          { hu: newVolunteer.trim(), en: newVolunteer.trim() },
-        ],
-      });
-      setNewVolunteer("");
-    }
   };
 
   const updateVolunteerOption = (index: number, value: string) => {
@@ -240,23 +226,6 @@ export default function EditSupportPage() {
             <CardTitle>Segítség opciók (checkboxok az RSVP-ben)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex gap-2">
-              <Input
-                value={newVolunteer}
-                onChange={(e) => setNewVolunteer(e.target.value)}
-                placeholder="Pl: ételkészítés, dekoráció..."
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addVolunteerOption();
-                  }
-                }}
-              />
-              <Button variant="outline" onClick={addVolunteerOption}>
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-
             <div className="space-y-2">
               {content.volunteerOptions.map((opt, index) => (
                 <div key={index} className="flex items-center gap-2">
