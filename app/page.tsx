@@ -145,7 +145,11 @@ function HomePage() {
         <HeroSection
           content={{ ...content.hero, invitationImage: heroImage }}
         />
-        <InfoSection content={content.info} language={language} />
+        <InfoSection
+          content={content.info}
+          language={language}
+          title={t("nav.info")}
+        />
         <RsvpSection
           volunteerOptions={volunteerOptionsForLanguage}
           language={language}

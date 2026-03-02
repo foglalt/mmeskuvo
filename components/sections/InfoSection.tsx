@@ -6,11 +6,24 @@ import { localizeText } from "@/lib/localizedContent";
 interface InfoSectionProps {
   content: InfoContent;
   language?: "hu" | "en";
+  title?: string;
 }
 
-export function InfoSection({ content, language = "hu" }: InfoSectionProps) {
+export function InfoSection({
+  content,
+  language = "hu",
+  title,
+}: InfoSectionProps) {
   return (
     <SectionWrapper id="info" className="bg-secondary/30">
+      {title && (
+        <div className="text-center mb-8">
+          <h2 className="font-serif text-3xl md:text-4xl text-primary mb-4">
+            {title}
+          </h2>
+        </div>
+      )}
+
       {/* Main content */}
       <MarkdownRenderer content={localizeText(content.mainText, language)} />
 

@@ -195,7 +195,11 @@ export default function EditInfoPage() {
       <div className="lg:sticky lg:top-8 lg:self-start">
         <h2 className="text-lg font-medium text-gray-700 mb-4">Előnézet</h2>
         <div className="border rounded-lg overflow-hidden bg-secondary/30 max-h-[80vh] overflow-auto">
-          <InfoSection content={content} language={activeLanguage} />
+          <InfoSection
+            content={content}
+            language={activeLanguage}
+            title={activeLanguage === "hu" ? "Információk" : "Information"}
+          />
         </div>
       </div>
     </div>
