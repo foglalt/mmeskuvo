@@ -62,10 +62,10 @@ export const metadata: Metadata = {
   description: "Esküvői meghívó és információk",
   icons: {
     icon: [
-      { url: "/favicon-mnm.svg?v=5", type: "image/svg+xml" },
-      { url: "/favicon.ico?v=5", type: "image/x-icon", sizes: "any" },
+      { url: "/favicon-mnm.svg?v=6", type: "image/svg+xml" },
+      { url: "/favicon.ico?v=6", type: "image/x-icon", sizes: "any" },
     ],
-    shortcut: "/favicon.ico?v=5",
+    shortcut: "/favicon.ico?v=6",
   },
 };
 
