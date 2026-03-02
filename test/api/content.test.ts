@@ -43,7 +43,12 @@ const createPrismaStub = (result: unknown, shouldThrow = false): PrismaStub => {
           support: {
             intro: "",
             options: [],
-            volunteerOptions: [],
+            volunteerOptions: [
+              {
+                hu: "Szeretnek segiteni az etelek elokesziteseben",
+                en: "I'd like to help with the food preparations",
+              },
+            ],
           },
           about: {
             story: "",
@@ -84,6 +89,9 @@ describe("GET /api/content", () => {
 
     expect(data.id).toBe("main");
     expect(data.hero.invitationImage).toBe("/images/invitation-placeholder.svg");
+    expect(data.support.volunteerOptions[0].en).toBe(
+      "I'd like to help with the food preparations"
+    );
     expect(data.about.images).toHaveLength(8);
     expect(data.about.images[0].src).toBe("/images/2024_12_21.jpg");
     expect(prismaStub.siteContent.create).toHaveBeenCalledTimes(1);
@@ -98,6 +106,9 @@ describe("GET /api/content", () => {
 
     expect(data.id).toBe("main");
     expect(data.hero.invitationImage).toBe("/images/invitation-placeholder.svg");
+    expect(data.support.volunteerOptions[0].en).toBe(
+      "I'd like to help with the food preparations"
+    );
     expect(data.about.images).toHaveLength(8);
     expect(data.about.images[0].src).toBe("/images/2024_12_21.jpg");
   });

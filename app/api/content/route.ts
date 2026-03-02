@@ -30,6 +30,34 @@ const LEGACY_ABOUT_IMAGE_SOURCES = new Set([
   "/images/us6.jpeg",
 ]);
 
+const DEFAULT_VOLUNTEER_OPTION = {
+  hu: "Szeretnek segiteni az etelek elokesziteseben",
+  en: "I'd like to help with the food preparations",
+} as const;
+
+const normalizeVolunteerText = (value: string) => value.trim().toLowerCase();
+
+const ensureDefaultVolunteerOption = (
+  support: ReturnType<typeof normalizeSupportContent>
+) => {
+  const hasDefaultOption = support.volunteerOptions.some(
+    (option) =>
+      normalizeVolunteerText(option.hu) ===
+        normalizeVolunteerText(DEFAULT_VOLUNTEER_OPTION.hu) ||
+      normalizeVolunteerText(option.en) ===
+        normalizeVolunteerText(DEFAULT_VOLUNTEER_OPTION.en)
+  );
+
+  if (hasDefaultOption) {
+    return support;
+  }
+
+  return {
+    ...support,
+    volunteerOptions: [...support.volunteerOptions, DEFAULT_VOLUNTEER_OPTION],
+  };
+};
+
 const defaultContent = {
   id: "main",
   theme: {
@@ -53,7 +81,7 @@ const defaultContent = {
   support: {
     intro: { hu: "", en: "" },
     options: [],
-    volunteerOptions: [],
+    volunteerOptions: [DEFAULT_VOLUNTEER_OPTION],
   },
   about: {
     story: { hu: "", en: "" },
@@ -89,7 +117,7 @@ export async function GET() {
     const normalized = {
       ...content,
       info: normalizeInfoContent(content.info),
-      support: normalizeSupportContent(content.support),
+      support: ensureDefaultVolunteerOption(normalizeSupportContent(content.support)),
       about: normalizeAboutContent(content.about),
     };
 
@@ -200,7 +228,7 @@ export async function PUT(request: NextRequest) {
           normalizedSupport || {
             intro: { hu: "", en: "" },
             options: [],
-            volunteerOptions: [],
+            volunteerOptions: [DEFAULT_VOLUNTEER_OPTION],
           }
         ),
         about: toJson(

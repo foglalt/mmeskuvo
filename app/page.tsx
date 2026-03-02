@@ -36,6 +36,13 @@ const DEFAULT_ABOUT_IMAGES = [
   { src: "/images/2025_11_09.jpg" },
 ] as const;
 
+const DEFAULT_VOLUNTEER_OPTIONS = [
+  {
+    hu: "Szeretnek segiteni az etelek elokesziteseben",
+    en: "I'd like to help with the food preparations",
+  },
+] as const;
+
 // Default content for initial render
 const defaultContent: Omit<SiteContent, "id" | "updatedAt"> = {
   theme: {
@@ -59,7 +66,7 @@ const defaultContent: Omit<SiteContent, "id" | "updatedAt"> = {
   support: {
     intro: { hu: "", en: "" },
     options: [],
-    volunteerOptions: [],
+    volunteerOptions: [...DEFAULT_VOLUNTEER_OPTIONS],
   },
   about: {
     story: { hu: "", en: "" },
