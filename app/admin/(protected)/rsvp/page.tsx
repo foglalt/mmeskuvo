@@ -228,23 +228,9 @@ export default function RsvpListPage() {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-col gap-2">
                       {submission.needsAccommodation && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
-                          <Home className="h-3 w-3 mr-1" />
-                          Szállás
-                        </span>
-                      )}
-                      {submission.needsTransport && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-700">
-                          <Car className="h-3 w-3 mr-1" />
-                          Szállítás
-                        </span>
-                      )}
-                    </div>
-                    <div className="mt-2 flex flex-col gap-2">
-                      {submission.needsAccommodation && (
-                        <div className="flex flex-wrap items-center gap-2">
+                        <label className="inline-flex items-center gap-2 text-sm">
                           <span
                             className={
                               submission.accommodationResolved
@@ -252,32 +238,30 @@ export default function RsvpListPage() {
                                 : "inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700"
                             }
                           >
-                            {submission.accommodationResolved
-                              ? "Szállás megoldva"
-                              : "Szállás függőben"}
+                            <Home className="h-3 w-3 mr-1" />
+                            Szállás
                           </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed"
+                            checked={submission.accommodationResolved}
                             disabled={
-                              submission.accommodationResolved ||
                               updatingKey ===
                                 `${submission.id}:accommodationResolved`
                             }
-                            onClick={() =>
+                            onChange={(event) =>
                               updateResolution(
                                 submission.id,
                                 "accommodationResolved",
-                                true
+                                event.currentTarget.checked
                               )
                             }
-                          >
-                            Szállás megoldása
-                          </Button>
-                        </div>
+                            aria-label="Szállás megoldva"
+                          />
+                        </label>
                       )}
                       {submission.needsTransport && (
-                        <div className="flex flex-wrap items-center gap-2">
+                        <label className="inline-flex items-center gap-2 text-sm">
                           <span
                             className={
                               submission.transportResolved
@@ -285,28 +269,26 @@ export default function RsvpListPage() {
                                 : "inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700"
                             }
                           >
-                            {submission.transportResolved
-                              ? "Szállítás megoldva"
-                              : "Szállítás függőben"}
+                            <Car className="h-3 w-3 mr-1" />
+                            Szállítás
                           </span>
-                          <Button
-                            variant="outline"
-                            size="sm"
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed"
+                            checked={submission.transportResolved}
                             disabled={
-                              submission.transportResolved ||
                               updatingKey === `${submission.id}:transportResolved`
                             }
-                            onClick={() =>
+                            onChange={(event) =>
                               updateResolution(
                                 submission.id,
                                 "transportResolved",
-                                true
+                                event.currentTarget.checked
                               )
                             }
-                          >
-                            Szállítás megoldása
-                          </Button>
-                        </div>
+                            aria-label="Szállítás megoldva"
+                          />
+                        </label>
                       )}
                     </div>
                     {submission.volunteerOptions.length > 0 && (
