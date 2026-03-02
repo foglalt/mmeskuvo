@@ -6,6 +6,7 @@ import { Plus, X, Check, Sparkles, Pencil } from "lucide-react";
 import { Button, Input, Textarea, Checkbox } from "@/components/ui";
 
 const RSVP_STORAGE_KEY = "wedding-rsvp-submission";
+const HELP_TRANSPORT_TOKEN = "__help_transport__";
 
 interface StoredRsvpSubmission {
   id: string;
@@ -30,6 +31,7 @@ interface RsvpFormProps {
     accommodation: string;
     transport: string;
     help: string;
+    helpTransport: string;
     commentsLabel: string;
     commentsPlaceholder: string;
     submit: string;
@@ -80,6 +82,7 @@ export function RsvpForm({ language, translations }: RsvpFormProps) {
   const [needsAccommodation, setNeedsAccommodation] = useState(false);
   const [needsTransport, setNeedsTransport] = useState(false);
   const [needsHelp, setNeedsHelp] = useState(false);
+  const [canHelpWithTransport, setCanHelpWithTransport] = useState(false);
   const [comments, setComments] = useState("");
 
   useEffect(() => {
@@ -96,12 +99,30 @@ export function RsvpForm({ language, translations }: RsvpFormProps) {
   }, []);
 
   const populateFormFromStoredSubmission = (submission: StoredRsvpSubmission) => {
+    const volunteerOptions = submission.volunteerOptions.map((option) =>
+      option.toLowerCase()
+    );
+    const hasTransportHelp = volunteerOptions.some(
+      (option) =>
+        option === HELP_TRANSPORT_TOKEN ||
+        option.includes("transport") ||
+        option.includes("szállítás")
+    );
+    const hasAnyHelp = volunteerOptions.length > 0;
+    const hasFoodHelp = volunteerOptions.some(
+      (option) =>
+        option !== HELP_TRANSPORT_TOKEN &&
+        !option.includes("transport") &&
+        !option.includes("szállítás")
+    );
+
     setGuestName(submission.guestName);
     setAdditionalGuests(submission.additionalGuests);
     setPhone(submission.phone ?? "");
     setNeedsAccommodation(submission.needsAccommodation);
     setNeedsTransport(submission.needsTransport);
-    setNeedsHelp(submission.volunteerOptions.length > 0);
+    setNeedsHelp(hasAnyHelp && (hasFoodHelp || !hasTransportHelp));
+    setCanHelpWithTransport(hasTransportHelp);
     setComments(submission.comments ?? "");
   };
 
@@ -147,7 +168,10 @@ export function RsvpForm({ language, translations }: RsvpFormProps) {
       additionalGuests: additionalGuests.filter((g) => g.trim() !== ""),
       needsAccommodation,
       needsTransport,
-      volunteerOptions: needsHelp ? [translations.help] : [],
+      volunteerOptions: [
+        ...(needsHelp ? [translations.help] : []),
+        ...(canHelpWithTransport ? [HELP_TRANSPORT_TOKEN] : []),
+      ],
       language,
     };
 
@@ -212,7 +236,23 @@ export function RsvpForm({ language, translations }: RsvpFormProps) {
       : translations.summaryNone;
   const summaryVolunteerOptions =
     storedSubmission && storedSubmission.volunteerOptions.length > 0
-      ? translations.summaryYes
+      ? [
+          storedSubmission.volunteerOptions.some(
+            (option) => option !== HELP_TRANSPORT_TOKEN
+          )
+            ? translations.help
+            : null,
+          storedSubmission.volunteerOptions.some(
+            (option) =>
+              option === HELP_TRANSPORT_TOKEN ||
+              option.toLowerCase().includes("transport") ||
+              option.toLowerCase().includes("szállítás")
+          )
+            ? translations.helpTransport
+            : null,
+        ]
+          .filter((option): option is string => Boolean(option))
+          .join(", ")
       : translations.summaryNo;
 
   if (!showForm && storedSubmission) {
@@ -363,6 +403,11 @@ export function RsvpForm({ language, translations }: RsvpFormProps) {
           label={translations.help}
           checked={needsHelp}
           onChange={(e) => setNeedsHelp(e.target.checked)}
+        />
+        <Checkbox
+          label={translations.helpTransport}
+          checked={canHelpWithTransport}
+          onChange={(e) => setCanHelpWithTransport(e.target.checked)}
         />
       </div>
 

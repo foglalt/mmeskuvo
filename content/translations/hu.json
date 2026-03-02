@@ -14,6 +14,7 @@
   "rsvp.accommodation": "Szállásban segítségre van szükségem",
   "rsvp.transport": "Szállításban segítségre van szükségem",
   "rsvp.help": "Szeretnék segíteni az ételek előkészítésében",
+  "rsvp.helpTransport": "Tudok segíteni a szállításban",
   "rsvp.commentsLabel": "Megjegyzés",
   "rsvp.comments": "Egyéb megjegyzés...",
   "rsvp.submit": "Visszajelzés küldése",

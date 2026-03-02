@@ -15,6 +15,7 @@ interface RsvpSectionProps {
     accommodation: string;
     transport: string;
     help: string;
+    helpTransport: string;
     commentsLabel: string;
     commentsPlaceholder: string;
     submit: string;

@@ -94,6 +94,7 @@ function HomePage() {
     accommodation: t("rsvp.accommodation"),
     transport: t("rsvp.transport"),
     help: t("rsvp.help"),
+    helpTransport: t("rsvp.helpTransport"),
     commentsLabel: t("rsvp.commentsLabel"),
     commentsPlaceholder: t("rsvp.comments"),
     submit: t("rsvp.submit"),
