@@ -36,6 +36,9 @@
   "support.moreInfo": "További információ",
 
   "about.title": "Rólunk",
+  "countdown.title": "Visszaszámlálás",
+  "countdown.daysLabel": "nap június 7-ig",
+  "countdown.hoursLabel": "óra 14:00-ig (budapesti idő)",
 
   "language.toggle": "Nyelv",
   "scrollDown": "Görgess lejjebb"

@@ -10,6 +10,7 @@ import { InfoSection } from "@/components/sections/InfoSection";
 import { RsvpSection } from "@/components/sections/RsvpSection";
 import { SupportSection } from "@/components/sections/SupportSection";
 import { AboutSection } from "@/components/sections/AboutSection";
+import { CountdownSection } from "@/components/sections/CountdownSection";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { SiteContent, ThemeConfig } from "@/types/content";
 import { localizeText } from "@/lib/localizedContent";
@@ -112,6 +113,11 @@ function HomePage() {
     summaryNo: t("rsvp.summaryNo"),
     summaryNone: t("rsvp.summaryNone"),
   };
+  const countdownTranslations = {
+    title: t("countdown.title"),
+    daysLabel: t("countdown.daysLabel"),
+    hoursLabel: t("countdown.hoursLabel"),
+  };
 
   const [content, setContent] = useState(defaultContent);
 
@@ -167,6 +173,7 @@ function HomePage() {
           moreInfoLabel={t("support.moreInfo")}
         />
         <AboutSection content={aboutContent} language={language} title={t("about.title")} />
+        <CountdownSection translations={countdownTranslations} />
       </main>
 
       <Footer />

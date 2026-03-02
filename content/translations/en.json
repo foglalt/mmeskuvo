@@ -36,6 +36,9 @@
   "support.moreInfo": "More information",
 
   "about.title": "About Us",
+  "countdown.title": "Countdown",
+  "countdown.daysLabel": "days until June 7",
+  "countdown.hoursLabel": "hours until 14:00 (Budapest time)",
 
   "language.toggle": "Language",
   "scrollDown": "Scroll down"
