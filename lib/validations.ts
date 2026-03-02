@@ -97,6 +97,7 @@ export const rsvpResolutionUpdateSchema = z
     accommodationResolved: z.boolean().optional(),
     transportResolved: z.boolean().optional(),
     volunteerResolved: z.boolean().optional(),
+    volunteerTransportResolved: z.boolean().optional(),
     adminComment: z.string().max(2000).optional(),
   })
   .refine(
@@ -104,6 +105,7 @@ export const rsvpResolutionUpdateSchema = z
       value.accommodationResolved !== undefined ||
       value.transportResolved !== undefined ||
       value.volunteerResolved !== undefined ||
+      value.volunteerTransportResolved !== undefined ||
       value.adminComment !== undefined,
     {
       message: "At least one update field is required",

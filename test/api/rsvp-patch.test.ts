@@ -46,6 +46,7 @@ describe("PATCH /api/rsvp/[id]", () => {
       accommodationResolved: true,
       transportResolved: false,
       volunteerResolved: false,
+      volunteerTransportResolved: false,
       adminComment: null,
     });
 
@@ -74,12 +75,42 @@ describe("PATCH /api/rsvp/[id]", () => {
     expect(data.accommodationResolved).toBe(true);
   });
 
+  it("updates transport-help resolution when authenticated", async () => {
+    const updateMock = vi.fn().mockResolvedValue({
+      id: "rsvp_6",
+      volunteerTransportResolved: true,
+    });
+
+    mockedVerifyAuth.mockResolvedValue({ success: true });
+    mockedGetPrisma.mockReturnValue({
+      rsvpSubmission: {
+        update: updateMock,
+      },
+    } as unknown as ReturnType<typeof getPrisma>);
+
+    const response = await PATCH(
+      new Request("http://localhost/api/rsvp/rsvp_6", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ volunteerTransportResolved: true }),
+      }) as Parameters<typeof PATCH>[0],
+      { params: Promise.resolve({ id: "rsvp_6" }) }
+    );
+
+    expect(response.status).toBe(200);
+    expect(updateMock).toHaveBeenCalledWith({
+      where: { id: "rsvp_6" },
+      data: { volunteerTransportResolved: true },
+    });
+  });
+
   it("updates admin comment when authenticated", async () => {
     const updateMock = vi.fn().mockResolvedValue({
       id: "rsvp_4",
       accommodationResolved: false,
       transportResolved: false,
       volunteerResolved: true,
+      volunteerTransportResolved: false,
       adminComment: "Need callback on Tuesday",
     });
 

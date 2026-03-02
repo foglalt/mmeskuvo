@@ -6,6 +6,22 @@ import { Download, Trash2, Users, Car, Home, Heart } from "lucide-react";
 import type { RsvpSubmission } from "@/types/content";
 
 const MAX_ADMIN_COMMENT_LENGTH = 2000;
+const HELP_TRANSPORT_TOKEN = "__help_transport__";
+
+const isTransportHelpOption = (option: string) => {
+  const normalized = option.trim().toLowerCase();
+  return (
+    normalized === HELP_TRANSPORT_TOKEN ||
+    normalized.includes("transport") ||
+    normalized.includes("szállítás")
+  );
+};
+
+const hasTransportHelpOffer = (submission: RsvpSubmission) =>
+  submission.volunteerOptions.some(isTransportHelpOption);
+
+const hasFoodHelpOffer = (submission: RsvpSubmission) =>
+  submission.volunteerOptions.some((option) => !isTransportHelpOption(option));
 
 const formatHungarianMonthDay = (date: Date | string) => {
   const parsed = typeof date === "string" ? new Date(date) : date;
@@ -30,9 +46,18 @@ const getRequestSummary = (submission: RsvpSubmission) => {
       submission.transportResolved ? "Szállítás (megoldva)" : "Szállítás"
     );
   }
-  if (submission.volunteerOptions.length > 0) {
+  if (hasFoodHelpOffer(submission)) {
     requested.push(
-      submission.volunteerResolved ? "Segítség (megoldva)" : "Segítség"
+      submission.volunteerResolved
+        ? "Segítség (étel, megoldva)"
+        : "Segítség (étel)"
+    );
+  }
+  if (hasTransportHelpOffer(submission)) {
+    requested.push(
+      submission.volunteerTransportResolved
+        ? "Segítség (szállítás, megoldva)"
+        : "Segítség (szállítás)"
     );
   }
   return requested.length > 0 ? requested.join("; ") : "-";
@@ -95,7 +120,8 @@ export default function RsvpListPage() {
     field:
       | "accommodationResolved"
       | "transportResolved"
-      | "volunteerResolved",
+      | "volunteerResolved"
+      | "volunteerTransportResolved",
     value: boolean
   ) => {
     setUpdatingKey(`${id}:${field}`);
@@ -227,9 +253,16 @@ export default function RsvpListPage() {
   const needsTransportPending = submissions.filter(
     (s) => s.needsTransport && !s.transportResolved
   ).length;
-  const needsVolunteerPending = submissions.filter(
-    (s) => s.volunteerOptions.length > 0 && !s.volunteerResolved
-  ).length;
+  const needsVolunteerPending = submissions.reduce((count, submission) => {
+    const foodPending =
+      hasFoodHelpOffer(submission) && !submission.volunteerResolved ? 1 : 0;
+    const transportPending =
+      hasTransportHelpOffer(submission) &&
+      !submission.volunteerTransportResolved
+        ? 1
+        : 0;
+    return count + foodPending + transportPending;
+  }, 0);
 
   if (loading) {
     return <div className="p-8">Betöltés...</div>;
@@ -326,8 +359,11 @@ export default function RsvpListPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {submissions.map((submission) => (
-                <tr key={submission.id} className="hover:bg-gray-50">
+              {submissions.map((submission) => {
+                const hasFoodHelp = hasFoodHelpOffer(submission);
+                const hasTransportHelp = hasTransportHelpOffer(submission);
+                return (
+                  <tr key={submission.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="font-medium text-gray-900">{submission.guestName}</div>
                     {submission.additionalGuests.length > 0 && (
@@ -404,7 +440,7 @@ export default function RsvpListPage() {
                           />
                         </label>
                       )}
-                      {submission.volunteerOptions.length > 0 && (
+                      {hasFoodHelp && (
                         <label className="inline-flex items-center gap-2 text-sm">
                           <span
                             className={
@@ -414,7 +450,7 @@ export default function RsvpListPage() {
                             }
                           >
                             <Heart className="h-3 w-3 mr-1" />
-                            Segítség
+                            Segítség (étel)
                           </span>
                           <input
                             type="checkbox"
@@ -434,9 +470,41 @@ export default function RsvpListPage() {
                           />
                         </label>
                       )}
+                      {hasTransportHelp && (
+                        <label className="inline-flex items-center gap-2 text-sm">
+                          <span
+                            className={
+                              submission.volunteerTransportResolved
+                                ? "inline-flex items-center px-2 py-1 rounded-full text-xs bg-emerald-100 text-emerald-700"
+                                : "inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-700"
+                            }
+                          >
+                            <Car className="h-3 w-3 mr-1" />
+                            Segítség (szállítás)
+                          </span>
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed"
+                            checked={submission.volunteerTransportResolved}
+                            disabled={
+                              updatingKey ===
+                              `${submission.id}:volunteerTransportResolved`
+                            }
+                            onChange={(event) =>
+                              updateResolution(
+                                submission.id,
+                                "volunteerTransportResolved",
+                                event.currentTarget.checked
+                              )
+                            }
+                            aria-label="Szállítási segítség megoldva"
+                          />
+                        </label>
+                      )}
                       {!submission.needsAccommodation &&
                         !submission.needsTransport &&
-                        submission.volunteerOptions.length === 0 && (
+                        !hasFoodHelp &&
+                        !hasTransportHelp && (
                           <span className="text-sm text-gray-400">-</span>
                         )}
                     </div>
@@ -478,8 +546,9 @@ export default function RsvpListPage() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
