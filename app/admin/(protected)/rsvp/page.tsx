@@ -153,7 +153,7 @@ export default function RsvpListPage() {
       s.accommodationResolved ? "Igen" : "Nem",
       s.needsTransport ? "Igen" : "Nem",
       s.transportResolved ? "Igen" : "Nem",
-      s.volunteerOptions.join("; "),
+      s.volunteerOptions.length > 0 ? "Igen" : "Nem",
       s.volunteerResolved ? "Igen" : "Nem",
       s.adminComment || "",
       s.comments || "",
@@ -388,11 +388,6 @@ export default function RsvpListPage() {
                         </label>
                       )}
                     </div>
-                    {submission.volunteerOptions.length > 0 && (
-                      <div className="mt-1 text-xs text-gray-500">
-                        Segít: {submission.volunteerOptions.join(", ")}
-                      </div>
-                    )}
                     {submission.comments && (
                       <div className="mt-1 text-xs text-gray-500 italic">
                         &quot;{submission.comments}&quot;

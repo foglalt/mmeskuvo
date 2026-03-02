@@ -96,22 +96,6 @@ export default function EditSupportPage() {
     });
   };
 
-  const updateVolunteerOption = (index: number, value: string) => {
-    const updated = [...content.volunteerOptions];
-    updated[index] = {
-      ...updated[index],
-      [activeLanguage]: value,
-    };
-    setContent({ ...content, volunteerOptions: updated });
-  };
-
-  const removeVolunteerOption = (index: number) => {
-    setContent({
-      ...content,
-      volunteerOptions: content.volunteerOptions.filter((_, i) => i !== index),
-    });
-  };
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div className="space-y-6">
@@ -221,32 +205,6 @@ export default function EditSupportPage() {
           ))}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Segítség opciók (checkboxok az RSVP-ben)</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="space-y-2">
-              {content.volunteerOptions.map((opt, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Input
-                    value={opt[activeLanguage]}
-                    onChange={(e) => updateVolunteerOption(index, e.target.value)}
-                    placeholder="Segítség opció megnevezése"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeVolunteerOption(index)}
-                    className="text-red-500"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="lg:sticky lg:top-8 lg:self-start">

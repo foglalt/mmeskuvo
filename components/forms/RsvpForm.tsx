@@ -20,7 +20,6 @@ interface StoredRsvpSubmission {
 }
 
 interface RsvpFormProps {
-  volunteerOptions: string[];
   language: "hu" | "en";
   translations: {
     nameLabel: string;
@@ -30,6 +29,7 @@ interface RsvpFormProps {
     phonePlaceholder: string;
     accommodation: string;
     transport: string;
+    help: string;
     commentsLabel: string;
     commentsPlaceholder: string;
     submit: string;
@@ -68,7 +68,7 @@ const isStoredRsvpSubmission = (
   );
 };
 
-export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormProps) {
+export function RsvpForm({ language, translations }: RsvpFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
   const [storedSubmission, setStoredSubmission] = useState<StoredRsvpSubmission | null>(null);
@@ -79,7 +79,7 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
   const [phone, setPhone] = useState("");
   const [needsAccommodation, setNeedsAccommodation] = useState(false);
   const [needsTransport, setNeedsTransport] = useState(false);
-  const [selectedVolunteer, setSelectedVolunteer] = useState<string[]>([]);
+  const [needsHelp, setNeedsHelp] = useState(false);
   const [comments, setComments] = useState("");
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
     setPhone(submission.phone ?? "");
     setNeedsAccommodation(submission.needsAccommodation);
     setNeedsTransport(submission.needsTransport);
-    setSelectedVolunteer(submission.volunteerOptions);
+    setNeedsHelp(submission.volunteerOptions.length > 0);
     setComments(submission.comments ?? "");
   };
 
@@ -122,14 +122,6 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
     const updated = [...additionalGuests];
     updated[index] = value;
     setAdditionalGuests(updated);
-  };
-
-  const toggleVolunteer = (option: string) => {
-    if (selectedVolunteer.includes(option)) {
-      setSelectedVolunteer(selectedVolunteer.filter((v) => v !== option));
-    } else {
-      setSelectedVolunteer([...selectedVolunteer, option]);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,7 +147,7 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
       additionalGuests: additionalGuests.filter((g) => g.trim() !== ""),
       needsAccommodation,
       needsTransport,
-      volunteerOptions: selectedVolunteer,
+      volunteerOptions: needsHelp ? [translations.help] : [],
       language,
     };
 
@@ -220,8 +212,8 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
       : translations.summaryNone;
   const summaryVolunteerOptions =
     storedSubmission && storedSubmission.volunteerOptions.length > 0
-      ? storedSubmission.volunteerOptions.join(", ")
-      : translations.summaryNone;
+      ? translations.summaryYes
+      : translations.summaryNo;
 
   if (!showForm && storedSubmission) {
     return (
@@ -367,22 +359,12 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
           checked={needsTransport}
           onChange={(e) => setNeedsTransport(e.target.checked)}
         />
+        <Checkbox
+          label={translations.help}
+          checked={needsHelp}
+          onChange={(e) => setNeedsHelp(e.target.checked)}
+        />
       </div>
-
-      {volunteerOptions.length > 0 && (
-        <div className="space-y-3">
-          <div className="space-y-2">
-            {volunteerOptions.map((option) => (
-              <Checkbox
-                key={option}
-                label={option}
-                checked={selectedVolunteer.includes(option)}
-                onChange={() => toggleVolunteer(option)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
       <Textarea
         label={translations.commentsLabel}

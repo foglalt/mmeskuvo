@@ -13,7 +13,6 @@ import { AboutSection } from "@/components/sections/AboutSection";
 import { CountdownSection } from "@/components/sections/CountdownSection";
 import { useLanguage } from "@/hooks/useLanguage";
 import type { SiteContent, ThemeConfig } from "@/types/content";
-import { localizeText } from "@/lib/localizedContent";
 
 const PLACEHOLDER_INVITATION_IMAGES = new Set([
   "",
@@ -94,6 +93,7 @@ function HomePage() {
     phonePlaceholder: t("rsvp.phonePlaceholder"),
     accommodation: t("rsvp.accommodation"),
     transport: t("rsvp.transport"),
+    help: t("rsvp.help"),
     commentsLabel: t("rsvp.commentsLabel"),
     commentsPlaceholder: t("rsvp.comments"),
     submit: t("rsvp.submit"),
@@ -128,9 +128,6 @@ function HomePage() {
     content.about.images?.length > 0
       ? content.about
       : { ...content.about, images: [...DEFAULT_ABOUT_IMAGES] };
-  const volunteerOptionsForLanguage = content.support.volunteerOptions
-    .map((option) => localizeText(option, language))
-    .filter((option) => option.trim() !== "");
 
   useEffect(() => {
     fetch("/api/content")
@@ -162,7 +159,6 @@ function HomePage() {
           title={t("nav.info")}
         />
         <RsvpSection
-          volunteerOptions={volunteerOptionsForLanguage}
           language={language}
           translations={rsvpTranslations}
         />
