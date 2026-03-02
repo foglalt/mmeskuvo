@@ -30,7 +30,6 @@ interface RsvpFormProps {
     phonePlaceholder: string;
     accommodation: string;
     transport: string;
-    volunteerTitle: string;
     commentsLabel: string;
     commentsPlaceholder: string;
     supportLink: string;
@@ -373,9 +372,6 @@ export function RsvpForm({ volunteerOptions, language, translations }: RsvpFormP
 
       {volunteerOptions.length > 0 && (
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-700">
-            {translations.volunteerTitle}
-          </label>
           <div className="space-y-2">
             {volunteerOptions.map((option) => (
               <Checkbox

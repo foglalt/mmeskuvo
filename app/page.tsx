@@ -93,7 +93,6 @@ function HomePage() {
     phonePlaceholder: t("rsvp.phonePlaceholder"),
     accommodation: t("rsvp.accommodation"),
     transport: t("rsvp.transport"),
-    volunteerTitle: t("rsvp.volunteerTitle"),
     commentsLabel: t("rsvp.commentsLabel"),
     commentsPlaceholder: t("rsvp.comments"),
     supportLink: t("rsvp.supportLink"),
