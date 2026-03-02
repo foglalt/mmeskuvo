@@ -60,6 +60,13 @@ const libreBaskerville = Libre_Baskerville({
 export const metadata: Metadata = {
   title: "M & M Esküvő",
   description: "Esküvői meghívó és információk",
+  icons: {
+    icon: [
+      { url: "/favicon-mnm.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", type: "image/x-icon", sizes: "any" },
+    ],
+    shortcut: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

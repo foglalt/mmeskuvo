@@ -1,0 +1,15 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="8" y="8" width="240" height="240" rx="60" fill="#F5F0E8"/>
+  <rect x="8" y="8" width="240" height="240" rx="60" stroke="#D4A574" stroke-width="10"/>
+  <text
+    x="128"
+    y="138"
+    text-anchor="middle"
+    font-family="Playfair Display, Times New Roman, serif"
+    font-size="76"
+    font-weight="700"
+    fill="#D4A574"
+  >
+    M&amp;M
+  </text>
+</svg>
