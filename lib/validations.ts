@@ -112,6 +112,20 @@ export const rsvpResolutionUpdateSchema = z
     }
   );
 
+// Couple advice game
+export const gameAdviceSubmissionSchema = z.object({
+  guestName: z
+    .string()
+    .trim()
+    .min(2, "A név legalább 2 karakter legyen")
+    .max(120, "A név legfeljebb 120 karakter lehet"),
+  advice: z
+    .string()
+    .trim()
+    .min(5, "A tanács legalább 5 karakter legyen")
+    .max(1200, "A tanács legfeljebb 1200 karakter lehet"),
+});
+
 // Translations
 export const translationsSchema = z.object({
   hu: z.record(z.string(), z.string()),
@@ -130,5 +144,8 @@ export type AboutContent = z.infer<typeof aboutSchema>;
 export type SiteContentInput = z.infer<typeof siteContentSchema>;
 export type RsvpSubmissionInput = z.infer<typeof rsvpSubmissionSchema>;
 export type RsvpResolutionUpdateInput = z.infer<typeof rsvpResolutionUpdateSchema>;
+export type GameAdviceSubmissionInput = z.infer<
+  typeof gameAdviceSubmissionSchema
+>;
 export type TranslationsInput = z.infer<typeof translationsSchema>;
 

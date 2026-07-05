@@ -58,3 +58,14 @@ model RsvpSubmission {
   language  String   @default("hu") // Language used when submitting
   createdAt DateTime @default(now())
 }
+
+// Anonymous advice submitted by guests for the couple's reveal game
+model GameAdvice {
+  id        String    @id @default(cuid())
+  guestName String
+  advice    String
+  chosenAt  DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([chosenAt, createdAt])
+}
