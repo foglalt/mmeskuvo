@@ -61,11 +61,27 @@ model RsvpSubmission {
 
 // Anonymous advice submitted by guests for the couple's reveal game
 model GameAdvice {
-  id        String    @id @default(cuid())
+  id        String   @id @default(cuid())
   guestName String
   advice    String
-  chosenAt  DateTime?
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
 
-  @@index([chosenAt, createdAt])
+  selections GameAdviceSelection[]
+
+  @@index([createdAt])
+}
+
+enum GameAdviceRole {
+  BRIDE
+  GROOM
+}
+
+model GameAdviceSelection {
+  role     GameAdviceRole @id
+  adviceId String
+  chosenAt DateTime       @default(now())
+
+  advice GameAdvice @relation(fields: [adviceId], references: [id], onDelete: Cascade)
+
+  @@index([adviceId])
 }

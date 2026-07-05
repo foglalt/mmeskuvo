@@ -1,6 +1,9 @@
 export interface PublicGameAdvice {
   id: string;
   advice: string;
-  chosenAt: string | null;
+  brideChosenAt: string | null;
+  groomChosenAt: string | null;
   guestName?: string;
 }
+
+export type GameAdviceChooser = "bride" | "groom";

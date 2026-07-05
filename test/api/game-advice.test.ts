@@ -20,13 +20,18 @@ describe("game advice API", () => {
       {
         id: "hidden",
         advice: "Nevessetek sokat.",
-        chosenAt: null,
+        selections: [],
         guestName: "Titkos Vendég",
       },
       {
         id: "revealed",
         advice: "Mindig beszéljétek meg.",
-        chosenAt: new Date("2026-07-05T12:00:00.000Z"),
+        selections: [
+          {
+            role: "BRIDE",
+            chosenAt: new Date("2026-07-05T12:00:00.000Z"),
+          },
+        ],
         guestName: "Felfedett Vendég",
       },
     ]);
@@ -40,7 +45,11 @@ describe("game advice API", () => {
 
     expect(response.status).toBe(200);
     expect(data[0]).not.toHaveProperty("guestName");
+    expect(data[0].brideChosenAt).toBeNull();
+    expect(data[0].groomChosenAt).toBeNull();
     expect(data[1].guestName).toBe("Felfedett Vendég");
+    expect(data[1].brideChosenAt).toBe("2026-07-05T12:00:00.000Z");
+    expect(data[1].groomChosenAt).toBeNull();
     expect(response.headers.get("Cache-Control")).toBe("no-store");
   });
 
@@ -48,7 +57,6 @@ describe("game advice API", () => {
     const create = vi.fn().mockResolvedValue({
       id: "new-advice",
       advice: "Nevessetek együtt minden nap.",
-      chosenAt: null,
     });
 
     mockedGetPrisma.mockReturnValue({
@@ -75,9 +83,11 @@ describe("game advice API", () => {
         guestName: "Teszt Elek",
         advice: "Nevessetek együtt minden nap.",
       },
-      select: { id: true, advice: true, chosenAt: true },
+      select: { id: true, advice: true },
     });
     expect(data).not.toHaveProperty("guestName");
+    expect(data.brideChosenAt).toBeNull();
+    expect(data.groomChosenAt).toBeNull();
   });
 
   it("rejects advice that is too short", async () => {
@@ -95,21 +105,51 @@ describe("game advice API", () => {
     expect(mockedGetPrisma).not.toHaveBeenCalled();
   });
 
-  it("persists the choice and returns the revealed guest name", async () => {
-    const updateMany = vi.fn().mockResolvedValue({ count: 1 });
-    const findUnique = vi.fn().mockResolvedValue({
-      id: "advice-1",
-      advice: "Mindig legyetek egy csapat.",
-      chosenAt: new Date("2026-07-05T12:00:00.000Z"),
-      guestName: "Teszt Elek",
+  it("rejects an invalid chooser", async () => {
+    const request = new Request("http://localhost/api/game/advice/advice-1", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chooser: "witness" }),
+    });
+
+    const response = await PATCH(
+      request as unknown as Parameters<typeof PATCH>[0],
+      { params: Promise.resolve({ id: "advice-1" }) }
+    );
+
+    expect(response.status).toBe(400);
+    expect(mockedGetPrisma).not.toHaveBeenCalled();
+  });
+
+  it("sets the bride's independent favorite and reveals the guest name", async () => {
+    const findUnique = vi
+      .fn()
+      .mockResolvedValueOnce({ id: "advice-1" })
+      .mockResolvedValueOnce({
+        id: "advice-1",
+        advice: "Mindig legyetek egy csapat.",
+        selections: [
+          {
+            role: "BRIDE",
+            chosenAt: new Date("2026-07-05T12:00:00.000Z"),
+          },
+        ],
+        guestName: "Teszt Elek",
+      });
+    const upsert = vi.fn().mockResolvedValue({
+      role: "BRIDE",
+      adviceId: "advice-1",
     });
 
     mockedGetPrisma.mockReturnValue({
-      gameAdvice: { updateMany, findUnique },
+      gameAdvice: { findUnique },
+      gameAdviceSelection: { upsert },
     } as unknown as ReturnType<typeof getPrisma>);
 
     const request = new Request("http://localhost/api/game/advice/advice-1", {
       method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chooser: "bride" }),
     });
     const response = await PATCH(
       request as unknown as Parameters<typeof PATCH>[0],
@@ -118,10 +158,13 @@ describe("game advice API", () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(updateMany).toHaveBeenCalledWith({
-      where: { id: "advice-1", chosenAt: null },
-      data: { chosenAt: expect.any(Date) },
+    expect(upsert).toHaveBeenCalledWith({
+      where: { role: "BRIDE" },
+      update: { adviceId: "advice-1", chosenAt: expect.any(Date) },
+      create: { role: "BRIDE", adviceId: "advice-1" },
     });
+    expect(data.brideChosenAt).toBe("2026-07-05T12:00:00.000Z");
+    expect(data.groomChosenAt).toBeNull();
     expect(data.guestName).toBe("Teszt Elek");
   });
 });

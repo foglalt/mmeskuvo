@@ -126,6 +126,10 @@ export const gameAdviceSubmissionSchema = z.object({
     .max(1200, "A tanács legfeljebb 1200 karakter lehet"),
 });
 
+export const gameAdviceChoiceSchema = z.object({
+  chooser: z.enum(["bride", "groom"]),
+});
+
 // Translations
 export const translationsSchema = z.object({
   hu: z.record(z.string(), z.string()),
@@ -147,5 +151,6 @@ export type RsvpResolutionUpdateInput = z.infer<typeof rsvpResolutionUpdateSchem
 export type GameAdviceSubmissionInput = z.infer<
   typeof gameAdviceSubmissionSchema
 >;
+export type GameAdviceChoiceInput = z.infer<typeof gameAdviceChoiceSchema>;
 export type TranslationsInput = z.infer<typeof translationsSchema>;
 

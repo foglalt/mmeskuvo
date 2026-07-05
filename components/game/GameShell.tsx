@@ -41,8 +41,8 @@ function GameChrome({ children }: { children: ReactNode }) {
             href="/game/guest"
             className="group inline-flex items-baseline gap-3 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7441a2]"
           >
-            <span className="[font-family:var(--font-cormorant-garamond)] text-3xl font-semibold tracking-[-0.04em] text-[#482266] transition-colors group-hover:text-[#7441a2]">
-              M&nbsp;&amp;&nbsp;M
+            <span className="whitespace-nowrap [font-family:var(--font-cormorant-garamond)] text-[1.65rem] font-semibold tracking-[-0.04em] text-[#482266] transition-colors group-hover:text-[#7441a2] sm:text-3xl">
+              Jimena&nbsp;&amp;&nbsp;David
             </span>
             <span className="hidden text-[0.63rem] font-semibold tracking-[0.25em] text-[#805c9b] uppercase lg:inline">
               {copy.gameName}

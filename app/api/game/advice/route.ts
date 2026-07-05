@@ -12,18 +12,31 @@ export async function GET() {
       select: {
         id: true,
         advice: true,
-        chosenAt: true,
         guestName: true,
+        selections: {
+          select: { role: true, chosenAt: true },
+        },
       },
       orderBy: { createdAt: "asc" },
     });
 
-    const publicEntries: PublicGameAdvice[] = adviceEntries.map((entry) => ({
-      id: entry.id,
-      advice: entry.advice,
-      chosenAt: entry.chosenAt?.toISOString() ?? null,
-      ...(entry.chosenAt ? { guestName: entry.guestName } : {}),
-    }));
+    const publicEntries: PublicGameAdvice[] = adviceEntries.map((entry) => {
+      const brideSelection = entry.selections.find(
+        (selection) => selection.role === "BRIDE"
+      );
+      const groomSelection = entry.selections.find(
+        (selection) => selection.role === "GROOM"
+      );
+      const isChosen = Boolean(brideSelection || groomSelection);
+
+      return {
+        id: entry.id,
+        advice: entry.advice,
+        brideChosenAt: brideSelection?.chosenAt.toISOString() ?? null,
+        groomChosenAt: groomSelection?.chosenAt.toISOString() ?? null,
+        ...(isChosen ? { guestName: entry.guestName } : {}),
+      };
+    });
 
     return NextResponse.json(publicEntries, {
       headers: { "Cache-Control": "no-store" },
@@ -52,14 +65,15 @@ export async function POST(request: NextRequest) {
     const prisma = getPrisma();
     const created = await prisma.gameAdvice.create({
       data: validated.data,
-      select: { id: true, advice: true, chosenAt: true },
+      select: { id: true, advice: true },
     });
 
     return NextResponse.json(
       {
         id: created.id,
         advice: created.advice,
-        chosenAt: null,
+        brideChosenAt: null,
+        groomChosenAt: null,
       } satisfies PublicGameAdvice,
       { status: 201 }
     );
