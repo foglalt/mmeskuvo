@@ -6,7 +6,6 @@ export interface GameCopy {
   navGuest: string;
   navCouple: string;
   languageLabel: string;
-  guestEyebrow: string;
   guestTitle: string;
   guestIntro: string;
   guestNote: string;
@@ -23,7 +22,6 @@ export interface GameCopy {
   successTitle: string;
   successText: string;
   submitAnother: string;
-  coupleEyebrow: string;
   coupleTitle: string;
   coupleIntro: string;
   listTitle: string;
@@ -63,7 +61,6 @@ export const gameTranslations: Record<GameLanguage, GameCopy> = {
     navGuest: "Vendégeknek",
     navCouple: "A párnak",
     languageLabel: "Nyelv",
-    guestEyebrow: "01 · A vendégeknek",
     guestTitle: "Egy gondolat,\namit magukkal vihetnek.",
     guestIntro:
       "Írd le a legjobb tanácsodat M & M közös életéhez. A pár először csak az üzenetedet látja — a nevedet majd a választás fedi fel.",
@@ -82,7 +79,6 @@ export const gameTranslations: Record<GameLanguage, GameCopy> = {
     successText:
       "A tanácsod már ott várja a párt a névtelen üzenetek között.",
     submitAnother: "Másik tanács küldése",
-    coupleEyebrow: "02 · A párnak",
     coupleTitle: "Válasszatok egy gondolatot.",
     coupleIntro:
       "A tanácsok névtelenek. A szerző neve csak akkor jelenik meg, amikor kiválasztjátok a hozzá tartozó gondolatot.",
@@ -112,7 +108,6 @@ export const gameTranslations: Record<GameLanguage, GameCopy> = {
     navGuest: "For guests",
     navCouple: "For the couple",
     languageLabel: "Language",
-    guestEyebrow: "01 · For the guests",
     guestTitle: "One thought\nthey can carry with them.",
     guestIntro:
       "Share your best advice for M & M's life together. The couple will see only your message at first — choosing it will reveal your name.",
@@ -131,7 +126,6 @@ export const gameTranslations: Record<GameLanguage, GameCopy> = {
     successText:
       "Your advice is now waiting for the couple among the anonymous messages.",
     submitAnother: "Send another piece of advice",
-    coupleEyebrow: "02 · For the couple",
     coupleTitle: "Choose a thought.",
     coupleIntro:
       "The advice is anonymous. The author's name appears only after you choose the thought that belongs to them.",
@@ -160,7 +154,6 @@ export const gameTranslations: Record<GameLanguage, GameCopy> = {
     navGuest: "Para invitados",
     navCouple: "Para la pareja",
     languageLabel: "Idioma",
-    guestEyebrow: "01 · Para los invitados",
     guestTitle: "Un consejo\nque llevarán siempre consigo.",
     guestIntro:
       "Escribe tu mejor consejo para la vida en común de M & M. La pareja verá primero solo tu mensaje; tu nombre se revelará cuando lo elijan.",
@@ -179,7 +172,6 @@ export const gameTranslations: Record<GameLanguage, GameCopy> = {
     successText:
       "Tu consejo ya espera a la pareja entre los mensajes anónimos.",
     submitAnother: "Enviar otro consejo",
-    coupleEyebrow: "02 · Para la pareja",
     coupleTitle: "Elijan un consejo.",
     coupleIntro:
       "Los consejos son anónimos. El nombre de la persona aparece solo cuando eligen el mensaje que le corresponde.",

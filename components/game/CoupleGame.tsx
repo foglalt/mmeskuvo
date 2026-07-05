@@ -9,10 +9,6 @@ export function CoupleGame() {
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-12 sm:px-8 sm:py-16 lg:py-20">
       <div className="mb-10 max-w-3xl sm:mb-14">
-        <p className="mb-5 flex items-center gap-3 text-xs font-semibold tracking-[0.23em] text-[#805c9b] uppercase">
-          <span className="h-px w-8 bg-[#a77fc3]" />
-          {copy.coupleEyebrow}
-        </p>
         <h1 className="max-w-2xl [font-family:var(--font-cormorant-garamond)] text-5xl leading-[0.95] font-medium tracking-[-0.04em] text-[#3c1c59] sm:text-7xl">
           {copy.coupleTitle}
         </h1>

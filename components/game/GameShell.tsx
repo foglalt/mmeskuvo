@@ -3,7 +3,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart } from "lucide-react";
 import { GameLanguageProvider, useGameLanguage } from "./GameLanguageProvider";
 import { gameLanguageOptions } from "@/lib/gameTranslations";
 
@@ -104,11 +103,6 @@ function GameChrome({ children }: { children: ReactNode }) {
       </header>
 
       <div className="relative z-10 flex flex-1 flex-col">{children}</div>
-
-      <footer className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-8 text-xs font-medium tracking-[0.16em] text-[#805c9b] uppercase sm:px-8">
-        <span>2026 · M &amp; M</span>
-        <Heart aria-hidden="true" className="h-4 w-4 fill-[#c7a7df] text-[#7441a2]" />
-      </footer>
     </div>
   );
 }

@@ -53,10 +53,6 @@ export function AdviceForm() {
         transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
         className="max-w-xl"
       >
-        <p className="mb-5 flex items-center gap-3 text-xs font-semibold tracking-[0.23em] text-[#805c9b] uppercase">
-          <span className="h-px w-8 bg-[#a77fc3]" />
-          {copy.guestEyebrow}
-        </p>
         <h1 className="[font-family:var(--font-cormorant-garamond)] text-5xl leading-[0.95] font-medium tracking-[-0.04em] text-[#3c1c59] sm:text-7xl">
           {copy.guestTitle.split("\n").map((line) => (
             <span key={line} className="block">
